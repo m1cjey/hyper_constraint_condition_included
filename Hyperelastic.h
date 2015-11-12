@@ -9,7 +9,7 @@ public:
 	int NEI[200];
 	int NEI_w[200];
 	int N;
-	int N_w;
+	int Nr;
 	
 	double lambda;
 	double half_p[DIMENSION];
