@@ -35,7 +35,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 	calc_half_p(CON,PART,HYPER,HYPER1,0,r_num,t);
 
-	calc_F(PART,HYPER,HYPER1,r_num,t);
+	calc_F(PART,HYPER,HYPER1,t);
 
 	calc_stress(CON,HYPER,r_num);
 	
