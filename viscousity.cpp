@@ -9,7 +9,7 @@ void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER
 	double n_nator=0;
 	double V=get_volume(&CON);
 	double mi=V*CON.get_hyper_density();
-	double vis=CON.get_h_viscousity();
+	double vis=CON.get_h_vis();
 
 	if(t==1)	system("mkdir Viscousity");
 

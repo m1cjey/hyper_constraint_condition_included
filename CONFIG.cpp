@@ -324,16 +324,17 @@ mpsconfig::mpsconfig()
 
 
 //超弾性計算 
-	flag_ELAST=OFF;
+	flag_ELAST=OFF;				//どの計算をするかのフラグ
 	flag_HYPER=ON;
+	flag_vis=OFF;
 	hyper_density=1000;          //water:997.04  エタノール:798[kg/m3]
 	c10=30000;//30000;
 	c01=20000;//20000;
-	flag_wall=ON;
-	h_dis=1.9*distancebp;
+	h_dis=1.9*distancebp;		//各計算での影響半径
 	h_vis=1.0;
-	flag_vis=OFF;
-	nr_time=1000;	//15/2/8
+	nr_time=1000;	//15/2/8	//ニュートンラプソン法の最大反復回数
+	//剛体パラメータ
+	rigid_density=1000;
 }
 
 

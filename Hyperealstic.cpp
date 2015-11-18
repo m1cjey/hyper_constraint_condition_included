@@ -35,7 +35,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 	calc_half_p(CON,PART,HYPER,HYPER1,0,r_num,t);
 
-	calc_F(PART,HYPER,HYPER1,t);
+	calc_F(PART,HYPER,HYPER1,r_num,t);
 
 	calc_stress(CON,HYPER,r_num);
 	
@@ -714,24 +714,26 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 	double le=CON.get_distancebp();
 	double V=get_volume(&CON);
 	double mi=V*CON.get_hyper_density();
+	double mr=V*CON.get_rigid_density();
 
 	for(int i=0;i<h_num;i++)
 	{
 		double p_half_p[DIMENSION]={0,0,0};
 		int Ni=HYPER[i].N;
+		//内部粒子の影響
 		for(int j=0;j<Ni;j++)
 		{		
 			int jn=HYPER[i].NEI[j];
 			p_half_p[A_X]+=(HYPER[jn].stress[0][0]-HYPER[jn].lambda)*HYPER1[jn*h_num+i].DgDq[0]+HYPER[jn].stress[0][1]*HYPER1[jn*h_num+i].DgDq[1]+HYPER[jn].stress[0][2]*HYPER1[jn*h_num+i].DgDq[2];
 			p_half_p[A_Y]+=HYPER[jn].stress[1][0]*HYPER1[jn*h_num+i].DgDq[0]+(HYPER[jn].stress[1][1]-HYPER[jn].lambda)*HYPER1[jn*h_num+i].DgDq[1]+HYPER[jn].stress[1][2]*HYPER1[jn*h_num+i].DgDq[2];
 			p_half_p[A_Z]+=HYPER[jn].stress[2][0]*HYPER1[jn*h_num+i].DgDq[0]+HYPER[jn].stress[2][1]*HYPER1[jn*h_num+i].DgDq[1]+(HYPER[jn].stress[2][2]-HYPER[jn].lambda)*HYPER1[jn*h_num+i].DgDq[2];
-		}//jに関するfor文の終わり	
+		}
 		p_half_p[A_X]+=(HYPER[i].stress[0][0]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq[0]+HYPER[i].stress[0][1]*HYPER1[i*h_num+i].DgDq[1]+HYPER[i].stress[0][2]*HYPER1[i*h_num+i].DgDq[2];
 		p_half_p[A_Y]+=HYPER[i].stress[1][0]*HYPER1[i*h_num+i].DgDq[0]+(HYPER[i].stress[1][1]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq[1]+HYPER[i].stress[1][2]*HYPER1[i*h_num+i].DgDq[2];
 		p_half_p[A_Z]+=HYPER[i].stress[2][0]*HYPER1[i*h_num+i].DgDq[0]+HYPER[i].stress[2][1]*HYPER1[i*h_num+i].DgDq[1]+(HYPER[i].stress[2][2]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq[2];
-		//half_pの計算
 		
-		int Nr=0;
+		//外部粒子の影響
+		int Nr=HYPER[i].Nr;
 		for(int l=0;l<Nr;l++)
 		{
 			int ln=HYPER[i].NEI[l];
@@ -740,35 +742,43 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 			p_half_p[A_Y]-=HYPER[ln].lambda*HYPER1[ln*h_num+i].n0ij[A_Y];
 			p_half_p[A_Z]-=HYPER[ln].lambda*HYPER1[ln*h_num+i].n0ij[A_Z];
 		}
+		
+		//重力の影響
+		p_half_p[A_Z]-=mi*9.8;
+		
 		//位置座標の計算
-		/*if(CON.get_model_number()==21)
+		if(repetation==0)
 		{
-			if(i==0||i==18||i==36||i==54||i==72||i==90||i==108||i==126||i==144)
-			{
-				n_rx[i]=PART[i].r[A_X]+Dt*(HYPER[i].p[A_X]+Dt/2*p_half_p[A_X])/mi;
-				n_ry[i]=PART[i].r[A_Y]+Dt*(HYPER[i].p[A_Y]+Dt/2*p_half_p[A_Y])/mi;
-				n_rz[i]=PART[i].q0[A_Z];
-			}
-			else
-			{
-				n_rx[i]=PART[i].r[A_X]+Dt*(HYPER[i].p[A_X]+Dt/2*p_half_p[A_X])/mi;
-				n_ry[i]=PART[i].r[A_Y]+Dt*(HYPER[i].p[A_Y]+Dt/2*p_half_p[A_Y])/mi;
-				n_rz[i]=PART[i].r[A_Z]+Dt*(HYPER[i].p[A_Z]+Dt/2*p_half_p[A_Z])/mi;//Dt/2*(p_half_p[A_Z]-9.8*mi))/mi;////
-			}
-		}
-		else*/
-		{
+			HYPER[i].half_p[A_X]=HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X];
+			HYPER[i].half_p[A_Y]=HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y];
+			HYPER[i].half_p[A_Z]=HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z];
+			
 			PART[i].r[A_X]+=Dt*(HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X])/mi;
 			PART[i].r[A_Y]+=Dt*(HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y])/mi;
-			PART[i].r[A_Z]+=Dt*(HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z])/mi;//-9.8*mi))/mi;//Dt*0.5*p_half_p[A_Z])/mi;//
+			PART[i].r[A_Z]+=Dt*(HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z])/mi;
+		}
+		else
+		{
+			//運動量の更新
+			HYPER[i].p[A_X]=HYPER[i].half_p[A_X]+Dt*0.5*p_half_p[A_X];
+			HYPER[i].p[A_Y]=HYPER[i].half_p[A_Y]+Dt*0.5*p_half_p[A_Y];
+			HYPER[i].p[A_Z]=HYPER[i].half_p[A_Z]+Dt*0.5*p_half_p[A_Z];
+			//速度の更新
+			PART[i].u[A_X]=HYPER[i].half_p[A_X]/mi;
+			PART[i].u[A_Y]=HYPER[i].half_p[A_Y]/mi;
+			PART[i].u[A_Z]=HYPER[i].half_p[A_Z]/mi;
+			//角運動量の更新
+			HYPER[i].ang_p[A_X]=PART[i].r[A_Y]*HYPER[i].p[A_Z]-PART[i].r[A_Z]*HYPER[i].p[A_Y];
+			HYPER[i].ang_p[A_Y]=PART[i].r[A_Z]*HYPER[i].p[A_X]-PART[i].r[A_X]*HYPER[i].p[A_Z];
+			HYPER[i].ang_p[A_Z]=PART[i].r[A_X]*HYPER[i].p[A_Y]-PART[i].r[A_Y]*HYPER[i].p[A_X];
 		}
 	}
 
 	for(int i=h_num-r_num;i<h_num;i++)
 	{
-		//half_pの計算
 		double p_half_p[DIMENSION]={0,0,0};
 
+		//内部粒子の影響
 		int Ni=HYPER[i].N;
 		for(int j=0;j<Ni;j++)
 		{	
@@ -777,9 +787,10 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 			p_half_p[A_X]-=HYPER[jn].lambda*HYPER1[jn*h_num+i].DgDq[A_X];
 			p_half_p[A_Y]-=HYPER[jn].lambda*HYPER1[jn*h_num+i].DgDq[A_Y];
 			p_half_p[A_Z]-=HYPER[jn].lambda*HYPER1[jn*h_num+i].DgDq[A_Z];
-		}//jに関するfor文の終わり
-//		cout<<"partial_half["<<i<<"]="<<Dt/2*p_half_p3[A_X]<<" "<<Dt/2*p_half_p3[A_Y]<<" "<<Dt/2*p_half_p3[A_Z]<<endl;
-		int Nr=0;
+		}
+
+		//外部粒子の影響
+		int Nr=HYPER[i].Nr;
 		for(int l=0;l<Nr;l++)
 		{
 			int ln=HYPER[i].NEI[l];
@@ -791,53 +802,35 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 		p_half_p[A_Y]-=HYPER[i].lambda*HYPER1[i*h_num+i].n0ij[A_Y];
 		p_half_p[A_Z]-=HYPER[i].lambda*HYPER1[i*h_num+i].n0ij[A_Z];
 
-		PART[i].r[A_X]+=Dt*(HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X])/mi;
-		PART[i].r[A_Y]+=Dt*(HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y])/mi;
-		PART[i].r[A_Z]+=Dt*(HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z])/mi;//-9.8*mi))/mi;//Dt*0.5*p_half_p[A_Z])/mi;//
-
-//		cout<<"partial_half["<<i<<"]="<<Dt/2*p_half_p3[A_X]<<" "<<Dt/2*p_half_p3[A_Y]<<" "<<Dt/2*p_half_p3[A_Z]<<endl;
+		//重力の影響
+		//p_half_p[A_Z]-=9.8*mr;
 
 		if(repetation==0)
 		{
-			//half_pの更新
-			HYPER[i].half_p[A_X]=HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X];	HYPER[i].half_p[A_Y]=HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y];	HYPER[i].half_p[A_Z]=HYPER[i].p[A_Z]+Dt*0.5*(p_half_p[A_Z]-mi*9.8);//p_half_p[A_Z];//
+			HYPER[i].half_p[A_X]=HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X];
+			HYPER[i].half_p[A_Y]=HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y];
+			HYPER[i].half_p[A_Z]=HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z];
 			
-			//位置座標の更新
-			/*if(CON.get_model_number()==21)
-			{
-				if(i==0||i==18||i==36||i==54||i==72||i==90||i==108||i==126||i==144)
-				{
-					PART[i].r[A_Z]=PART[i].q0[A_Z];
-					PART[i].r[A_X]+=Dt*HYPER[i].half_p[A_X]/mi;
-					PART[i].r[A_Y]+=Dt*HYPER[i].half_p[A_Y]/mi;
-				}
-				else
-				{
-					PART[i].r[A_X]+=Dt*HYPER[i].half_p[A_X]/mi;
-					PART[i].r[A_Y]+=Dt*HYPER[i].half_p[A_Y]/mi;
-					PART[i].r[A_Z]+=Dt*HYPER[i].half_p[A_Z]/mi;
-				}
-			}
-			else*/
-			{
-				PART[i].r[A_X]+=Dt*HYPER[i].half_p[A_X]/mi;
-				PART[i].r[A_Y]+=Dt*HYPER[i].half_p[A_Y]/mi;
-				PART[i].p[A_Z]+=Dt*HYPER[i].half_p[A_Z]/mi;
-			}
+			PART[i].r[A_X]+=Dt*HYPER[i].half_p[A_X]/mr;
+			PART[i].r[A_Y]+=Dt*HYPER[i].half_p[A_Y]/mr;
+			PART[i].r[A_Z]+=Dt*HYPER[i].half_p[A_Z]/mr;
 		}
 		else
 		{
 			//運動量の更新
 			HYPER[i].p[A_X]=HYPER[i].half_p[A_X]+Dt*0.5*p_half_p[A_X];
 			HYPER[i].p[A_Y]=HYPER[i].half_p[A_Y]+Dt*0.5*p_half_p[A_Y];
-			HYPER[i].p[A_Z]=HYPER[i].half_p[A_Z]+Dt*0.5*(p_half_p[A_Z]-mi*9.8);//p_half_p[A_Z];////
+			HYPER[i].p[A_Z]=HYPER[i].half_p[A_Z]+Dt*0.5*p_half_p[A_Z];
 			//速度の更新
-			PART[i].u[A_X]=HYPER[i].half_p[A_X]/mi;		PART[i].u[A_Y]=HYPER[i].half_p[A_Y]/mi;		PART[i].u[A_Z]=HYPER[i].half_p[A_Z]/mi;
+			PART[i].u[A_X]=HYPER[i].half_p[A_X]/mr;
+			PART[i].u[A_Y]=HYPER[i].half_p[A_Y]/mr;
+			PART[i].u[A_Z]=HYPER[i].half_p[A_Z]/mr;
 			//角運動量の更新
-			HYPER[i].ang_p[A_X]=PART[i].r[A_Y]*HYPER[i].p[A_Z]-PART[i].r[A_Z]*HYPER[i].p[A_Y];	HYPER[i].ang_p[A_Y]=PART[i].r[A_Z]*HYPER[i].p[A_X]-PART[i].r[A_X]*HYPER[i].p[A_Z];	HYPER[i].ang_p[A_Z]=PART[i].r[A_X]*HYPER[i].p[A_Y]-PART[i].r[A_Y]*HYPER[i].p[A_X];
-//			for(int D=0;D<DIMENSION;D++)cout<<"p["<<i<<"]="<<HYPER[i].half_p[D]<<"+"<<Dt<<"/2*"<<p_half_p3[D]<<" = "<<HYPER[i].p[D]<<endl;
+			HYPER[i].ang_p[A_X]=PART[i].r[A_Y]*HYPER[i].p[A_Z]-PART[i].r[A_Z]*HYPER[i].p[A_Y];
+			HYPER[i].ang_p[A_Y]=PART[i].r[A_Z]*HYPER[i].p[A_X]-PART[i].r[A_X]*HYPER[i].p[A_Z];
+			HYPER[i].ang_p[A_Z]=PART[i].r[A_X]*HYPER[i].p[A_Y]-PART[i].r[A_Y]*HYPER[i].p[A_X];
 		}
-	}//iに関するfor文の終わり
+	}
 	
 /*	if(repetation==0)
 	{
@@ -852,16 +845,17 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 	cout<<"----------OK"<<endl;
 }
 
-void calc_F(vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t)
+void calc_F(vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int rigid_number,int t)
 {
 	cout<<"Fi計算";
 	////Fiの更新
 	int h_num=HYPER.size();
+	int r_num=rigid_number;
 
 	double **p_Fi=new double *[DIMENSION];
 	for(int D=0;D<DIMENSION;D++)	p_Fi[D]=new double[DIMENSION];
 
-	for(int i=0;i<h_num;i++)
+	for(int i=0;i<h_num-r_num;i++)
 	{
 		double fi[DIMENSION][DIMENSION]={{0,0,0},{0,0,0},{0,0,0}};
 		//Fiの計算
@@ -908,7 +902,7 @@ void calc_F(vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelas
 	delete[]	p_Fi;
 
 	//calculation of DgDq
-	for(int i=0;i<h_num;i++)
+	for(int i=0;i<h_num-r_num;i++)
 	{
 		int Ni=HYPER[i].N;
 		for(int j=0;j<Ni;j++)
