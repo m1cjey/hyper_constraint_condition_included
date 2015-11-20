@@ -86,6 +86,7 @@ _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHE
 
 	cout<<"1"<<endl;
 //	PART.reserve(20000);
+	cout<<"p_num"<<particle_number<<endl;
 	for(int i=0;i<particle_number;i++){
 		PART1.push_back(PART0);
 		PART.push_back(PART0);
