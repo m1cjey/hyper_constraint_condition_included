@@ -226,8 +226,8 @@ void contact_judge_hyper(mpsconfig &CON,vector<mpselastic> &PART, vector<hyperel
 void contact_judge_hyper2(mpsconfig CON, vector<mpselastic> &PART, vector<hyperelastic> &HYPER, int hyper_number, int t);
 void output_hyper_data(vector<mpselastic> PART,vector<hyperelastic> HYPER,vector<hyperelastic2> HYPER1,int rigid_number,int t);
 void transpose(double **M,double **N);
-void output_newton_data1(double *fx, double *DfDx, double *n_rx, double *n_ry, double *n_rz, int rigid_number, int count, int t);
-void output_newton_data2(double E, double *XX, int rigid_number, int count, int t);
+void output_newton_data1(double *fx, double *DfDx, double *n_rx, double *n_ry, double *n_rz, int hyper_number, int count, int t);
+void output_newton_data2(double E, double *XX, int count,int hyper_number,  int t);
 void calculation_vec_norm(vector<mpselastic> PART, vector<hyperelastic> &HYPER,int rigid_number,int t);
 void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> HYPER, int rigid_number, int t);
 

@@ -7,7 +7,7 @@ public:
 
 	unsigned ID;
 	int NEI[200];
-	int NEI_w[200];
+	int NEIr[200];
 	int N;
 	int Nr;
 	

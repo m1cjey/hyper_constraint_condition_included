@@ -1229,8 +1229,8 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 	 /////////////////////////////////ただの立方体////////////////////////////////////
 	 else if(model==23)
 	 {
-		int height=5;
-		int base=5;
+		int height=4;
+		int base=4;
 		vector<int>suf;
 		vector<int>num;
 		//writedata2内決め打ち有
@@ -1306,7 +1306,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 		 
 		 int number2=0;
 	 	int number3=0;
-		 int w_base=9;
+		 int w_base=6;
 		 vector<int> w_suf;
 		 for(int k=0;k<3*2-1;k++)
 		 {
