@@ -310,7 +310,8 @@ _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHE
 		if(CON.get_flag_ELAST()==ON)	calc_elastic(PART, ELAST, t, F);	//if•ª‚Ì’Ç‰Á15/2/10
 
 		cout<<"hyper_number="<<hyper_number<<endl;
-
+		//”S’e«ŒvŽZ
+		if(CON.get_flag_vis()==ON)	calc_vis_f(CON,PART,HYPER,HYPER1,hyper_number-rigid_number,t);
 		//’´’e«ŒvŽZ
 		if(CON.get_flag_HYPER()==ON)	calc_hyper(CON,PART,HYPER,HYPER1,rigid_number,t);//if•ª‚Ì’Ç‰Á15/2/10
 

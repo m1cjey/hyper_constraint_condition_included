@@ -326,7 +326,7 @@ mpsconfig::mpsconfig()
 //超弾性計算 
 	flag_ELAST=OFF;				//どの計算をするかのフラグ
 	flag_HYPER=ON;
-	flag_vis=OFF;
+	flag_vis=ON;
 	hyper_density=1000;          //water:997.04  エタノール:798[kg/m3]
 	c10=30000;//30000;
 	c01=20000;//20000;
