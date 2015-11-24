@@ -764,33 +764,33 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 				flag_w=ON;
 				if(qik[A_X]<0)
 				{
-					DwDq[A_X]+=-r/(n_rx[i]*n_rx[i]);
-					n_DgDq_x[i][k]=1/n0*r/(n_rx[k]*n_rx[k]);
-				}
-				if(qik[A_X]>0)
-				{
 					DwDq[A_X]+=r/(n_rx[i]*n_rx[i]);
 					n_DgDq_x[i][k]=-1/n0*r/(n_rx[k]*n_rx[k]);
 				}
-				if(qik[A_Y]<0)
+				if(qik[A_X]>0)
 				{
-					DwDq[A_Y]+=-r/(n_ry[i]*n_ry[i]);
-					n_DgDq_y[i][k]=1/n0*r/(n_ry[k]*n_ry[k]);
+					DwDq[A_X]+=-r/(n_rx[i]*n_rx[i]);
+					n_DgDq_x[i][k]=1/n0*r/(n_rx[k]*n_rx[k]);
 				}
-				if(qik[A_Y]>0)
+				if(qik[A_Y]<0)
 				{
 					DwDq[A_Y]+=r/(n_ry[i]*n_ry[i]);
 					n_DgDq_y[i][k]=-1/n0*r/(n_ry[k]*n_ry[k]);
 				}
+				if(qik[A_Y]>0)
+				{
+					DwDq[A_Y]+=-r/(n_ry[i]*n_ry[i]);
+					n_DgDq_y[i][k]=1/n0*r/(n_ry[k]*n_ry[k]);
+				}
 				if(qik[A_Z]<0)
 				{
-					DwDq[A_Z]+=-r/(n_rz[i]*n_rz[i]);
-					n_DgDq_z[i][k]=1/n0*r/(n_rz[k]*n_rz[k]);
+					DwDq[A_Z]+=r/(n_rz[i]*n_rz[i]);
+					n_DgDq_z[i][k]=-1/n0*r/(n_rz[k]*n_rz[k]);
 				}
 				if(qik[A_Z]>0)
 				{
-					DwDq[A_Z]+=r/(n_rz[i]*n_rz[i]);					
-					n_DgDq_z[i][k]=-1/n0*r/(n_rz[k]*n_rz[k]);
+					DwDq[A_Z]+=-r/(n_rz[i]*n_rz[i]);					
+					n_DgDq_z[i][k]=1/n0*r/(n_rz[k]*n_rz[k]);
 				}
 			}
 		}
@@ -865,33 +865,33 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 				{
 					if(qki[A_X]<0)
 					{
-						DwDq[A_X]+=-r/(n_rx[k]*n_rx[k]);
-						n_DgDq_x[k][i]=1/n0*r/(n_rx[i]*n_rx[i]);
-					}
-					if(qki[A_X]>0)
-					{
 						DwDq[A_X]+=r/(n_rx[k]*n_rx[k]);
 						n_DgDq_x[k][i]=-1/n0*r/(n_rx[i]*n_rx[i]);
 					}
-					if(qki[A_Y]<0)
+					if(qki[A_X]>0)
 					{
-						DwDq[A_Y]+=-r/(n_ry[k]*n_ry[k]);
-						n_DgDq_y[k][i]=1/n0*r/(n_ry[i]*n_ry[i]);
+						DwDq[A_X]+=-r/(n_rx[k]*n_rx[k]);
+						n_DgDq_x[k][i]=1/n0*r/(n_rx[i]*n_rx[i]);
 					}
-					if(qki[A_Y]>0)
+					if(qki[A_Y]<0)
 					{
 						DwDq[A_Y]+=r/(n_ry[k]*n_ry[k]);
 						n_DgDq_y[k][i]=-1/n0*r/(n_ry[i]*n_ry[i]);
 					}
-					if(qki[A_Z]<0)
+					if(qki[A_Y]>0)
 					{
-						DwDq[A_Z]+=-r/(n_rz[k]*n_rz[k]);
-						n_DgDq_z[k][i]=1/n0*r/(n_rz[i]*n_rz[i]);
+						DwDq[A_Y]+=-r/(n_ry[k]*n_ry[k]);
+						n_DgDq_y[k][i]=1/n0*r/(n_ry[i]*n_ry[i]);
 					}
-					if(qki[A_Z]>0)
+					if(qki[A_Z]<0)
 					{
 						DwDq[A_Z]+=r/(n_rz[k]*n_rz[k]);
 						n_DgDq_z[k][i]=-1/n0*r/(n_rz[i]*n_rz[i]);
+					}
+					if(qki[A_Z]>0)
+					{
+						DwDq[A_Z]+=-r/(n_rz[k]*n_rz[k]);
+						n_DgDq_z[k][i]=1/n0*r/(n_rz[i]*n_rz[i]);
 					}
 				}
 			}
