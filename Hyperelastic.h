@@ -7,11 +7,7 @@ public:
 
 	unsigned ID;
 	int NEI0[200];
-	int NEIr[200];
-	int NEIh[200];
 	int N0;
-	int Nr;
-	int Nh;
 	double pnd;
 	
 	double lambda;
