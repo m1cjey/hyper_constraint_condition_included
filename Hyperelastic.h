@@ -8,6 +8,10 @@ public:
 	unsigned ID;
 	int NEI0[200];
 	int N0;
+	int NEIr[200];
+	int Nr;
+	int NEIh[200];
+	int Nh;
 	double pnd;
 	
 	double lambda;
