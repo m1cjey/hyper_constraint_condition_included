@@ -206,8 +206,8 @@ void check_FEM_flag(mpsconfig &CON, elastic &ELAST, double ave_P);
 
 //í¥íeê´
 void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int rigid_number,int t);
-void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,bool repetation,int rigid_number,int t);
-void renew_lambda(mpsconfig &CON,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int rigid_number,int t);
+void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,bool repetation,int rigid_number);
+void renew_lambda(mpsconfig &CON,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int rigid_number);
 void calc_differential_p(mpsconfig &CON,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int rigid_number);
 void calc_transposed_inverse_matrix(double **M,bool transport,bool inversion);
 double calc_det(double **M,int N);
@@ -216,7 +216,7 @@ void calc_stress(mpsconfig &CON,vector<hyperelastic> &HYPER,int rigid_number);
 void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int rigid_number);
 void calc_inverse_matrix_for_NR(int N, double *a);
 void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int rigid_number,int t);
-void calc_F(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int rigid_number,int t);
+void calc_F(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int rigid_number);
 void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> HYPER,vector<hyperelastic2> HYPER1,double *lambda,double *fx,double *DfDx,int rigid_number,int count,int t);
 void inverse(double **a,int N);
 void ludcmp(double **a,int N,int *index,double *d);
@@ -232,8 +232,10 @@ void calculation_vec_norm(vector<mpselastic> PART, vector<hyperelastic> &HYPER,i
 void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> HYPER, int rigid_number, int t);
 
 //îSê´çÄåvéZ
-void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>&HYPER1,int hyper_number,int t);
+//void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>&HYPER1,int hyper_number,int t);
+void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>HYPER1,int rigid_number,int t);
 void calc_spl_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic2>&HYPER1,int hyper_number);
 
 //âûóÕèoóÕä÷êî
 void force_movie_AVS(mpsconfig *CON,int t,vector<mpselastic> &PART,int particle_number,double m);
+

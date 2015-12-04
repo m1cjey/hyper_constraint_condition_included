@@ -8,12 +8,10 @@ public:
 	unsigned ID;
 	int NEI0[200];
 	int N0;
-	int NEIr[200];
-	int Nr;
-	int NEIh[200];
-	int Nh;
+	int NEI[200];
+	int N;
 	double pnd;
-	
+	double laplacian_lambda;
 	double lambda;
 	double half_p[DIMENSION];
 	double stress[DIMENSION][DIMENSION];
