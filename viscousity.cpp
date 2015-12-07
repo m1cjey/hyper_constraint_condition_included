@@ -31,11 +31,23 @@ void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER
 	}
 
 	double lambda=HYPER[0].laplacian_lambda;
+	ofstream fv("viscousity.csv",ios::app);
+	if(t==1)
+	{
+		fv<<",";
+		for(int i=0;i<h_num-r_num;i++)
+		{
+			fv<<i<<","<<","<<","<<","<<","<<","<<",";
+		}
+		fv<<endl;
+	}
+	fv<<t<<",";
 	for(int i=0;i<h_num-r_num;i++)
 	{
 		int Nh=0;
 		double p_vis[3]={0,0,0};
 		double n0=HYPER[i].pnd;
+		double pnd=0;
 		for(int j=0;j<h_num-r_num;j++)
 		{
 			if(j!=i)
@@ -47,28 +59,19 @@ void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER
 					double w=kernel4(r,dis);
 					p_vis[A_X]+=(HYPER[j].p[A_X]-HYPER[i].p[A_X])*w;
 					p_vis[A_Y]+=(HYPER[j].p[A_Y]-HYPER[i].p[A_Y])*w;
-					p_vis[A_Z]+=(HYPER[j].p[A_Z]-HYPER[i].p[A_Z])*w;				
+					p_vis[A_Z]+=(HYPER[j].p[A_Z]-HYPER[i].p[A_Z])*w;
 				}
 			}
 		}
 		HYPER[i].vis_force[A_X]=1/mi*v*2*d/lambda/n0*p_vis[A_X];
 		HYPER[i].vis_force[A_Y]=1/mi*v*2*d/lambda/n0*p_vis[A_Y];
 		HYPER[i].vis_force[A_Z]=1/mi*v*2*d/lambda/n0*p_vis[A_Z];
+		/*HYPER[i].vis_force[A_X]=2*v*HYPER[i].pnd*p_vis_d[A_X]/p_vis_n;
+		HYPER[i].vis_force[A_Y]=2*v*HYPER[i].pnd*p_vis_d[A_Y]/p_vis_n;
+		HYPER[i].vis_force[A_Z]=2*v*HYPER[i].pnd*p_vis_d[A_Z]/p_vis_n;*/
+		fv<<HYPER[i].vis_force[A_X]<<","<<HYPER[i].vis_force[A_Y]<<","<<HYPER[i].vis_force[A_Z]<<",";
 	}
 
-
-	ofstream fv("viscousity.csv",ios::app);
-	if(t==1)
-	{
-		fv<<",";
-		for(int i=0;i<h_num-r_num;i++)
-		{
-			fv<<i<<","<<","<<",";
-		}
-		fv<<endl;
-	}
-	fv<<t<<",";
-	for(int i=0;i<h_num-r_num;i++)			fv<<HYPER[i].vis_force[A_X]<<","<<HYPER[i].vis_force[A_Y]<<","<<HYPER[i].vis_force[A_Z]<<",";
 	fv<<endl;
 	fv.close();
 
