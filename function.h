@@ -17,7 +17,7 @@ void culan(mpsconfig *CON,vector<mpsparticle> &PART,int fluid_number,int t,doubl
 ///
 
 //粒子数カウント関数 & 並び替え
-void calc_numbers_of_particles_and_change_the_order(mpsconfig *CON, vector <mpselastic> &PART, int *fluid_number,int *hyper_number,int *magnetic_number,int *rigid_number,int *out,int *order_sw);	//main_another仕様	15/2/10
+void calc_numbers_of_particles_and_change_the_order(mpsconfig *CON, vector <mpselastic> &PART, int *fluid_number,int *hyper_number,int *magnetic_number,int *out,int *order_sw);	//main_another仕様	15/2/10
 //void calc_numbers_of_particles_and_change_the_order(mpsconfig *CON, vector <mpselastic> &PART, int *fluid_number,int *out,int *order_sw);	//main仕様	15/2/10
 int check_position(mpsconfig *CON,vector<mpselastic> &PART, int fluid_number, int *particle_number);
 
@@ -32,6 +32,7 @@ void reload_INDEX2(mpsconfig *CON, vector<mpselastic> &PART, int **MESH);
 //表面判定
 void freeon(mpsconfig &CON, vector<mpselastic> &PART, double n0_4,int *INDEX,int **MESH,double *mindis, int t);
 void freeon(elastic &ELAST, vector<mpselastic> &PART, double n0_4,int *INDEX,int **MESH, double *mindis, int t);
+void freeon2(mpsconfig &CON,vector<mpselastic> &PART,int particle_number,double n0_4,int *INDEX,int **MESH,double *mindis,int fluid_number,int out);
 
 void calc_neighbor_relation(mpsconfig *CON,vector<mpsparticle> &PART,int particle_number,double n0_4,int fluid_number,int out);
 void surface_judge2(mpsconfig *CON,vector<mpsparticle> &PART,int fluid_number,int particle_number);
@@ -205,37 +206,16 @@ void check_FEM_flag(mpsconfig &CON, elastic &ELAST, double ave_P);
 
 
 //超弾性
-void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int rigid_number,int t);
-void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,bool repetation,int rigid_number);
-void renew_lambda(mpsconfig &CON,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int rigid_number);
-void calc_differential_p(mpsconfig &CON,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int rigid_number);
-void calc_transposed_inverse_matrix(double **M,bool transport,bool inversion);
-double calc_det(double **M,int N);
-double calc_det3(double **M);
-void calc_stress(mpsconfig &CON,vector<hyperelastic> &HYPER,int rigid_number);
-void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int rigid_number);
-void calc_inverse_matrix_for_NR(int N, double *a);
-void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int rigid_number,int t);
-void calc_F(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int rigid_number);
-void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> HYPER,vector<hyperelastic2> HYPER1,double *lambda,double *fx,double *DfDx,int rigid_number,int count,int t);
-void inverse(double **a,int N);
-void ludcmp(double **a,int N,int *index,double *d);
-void lubksb(double **a,int N,int *index,double b[]);
-void momentum_movie_AVS(mpsconfig &CON,int t,vector<mpselastic> PART,vector<hyperelastic> HYPER,int rigid_number);
-void contact_judge_hyper(mpsconfig &CON,vector<mpselastic> &PART, vector<hyperelastic> &HYPER,int t);
-void contact_judge_hyper2(mpsconfig CON, vector<mpselastic> &PART, vector<hyperelastic> &HYPER, int hyper_number, int t);
-void output_hyper_data(vector<mpselastic> PART,vector<hyperelastic> HYPER,vector<hyperelastic2> HYPER1,int rigid_number,int t);
-void transpose(double **M,double **N);
-void output_newton_data1(double *fx, double *DfDx,double *n_rx, double *n_ry, double *n_rz, int hyper_number,int count,int t);
-void output_newton_data2(double E, double *XX, int count,int hyper_number,  int t);
-void calculation_vec_norm(vector<mpselastic> PART, vector<hyperelastic> &HYPER,int rigid_number,int t);
-void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> HYPER, int rigid_number, int t);
+void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t,double **F);
+
 
 //粘性項計算
-//void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>&HYPER1,int hyper_number,int t);
 void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>HYPER1,int rigid_number,int t);
 void calc_spl_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic2>&HYPER1,int hyper_number);
 
 //応力出力関数
 void force_movie_AVS(mpsconfig *CON,int t,vector<mpselastic> &PART,int particle_number,double m);
 
+//磁気モーメント法
+void Magnetic_Moment_Method(mpsconfig &CON,vector<mpselastic>&PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);
+void Magnetic_Moment_Methodv2(mpsconfig &CON,vector<mpselastic> &PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);

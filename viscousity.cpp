@@ -9,28 +9,7 @@ void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER
 	int r_num=rigid_number;
 	int d=3;
 	double mi=CON.get_hyper_density()*get_volume(&CON);
-
-	if(t==1)
-	{
-		double lambda_d=0;
-		double lambda_n=0;
-		for(int i=0;i<h_num-r_num;i++)
-		{
-			int N0=HYPER[i].N0;
-			for(int j=0;j<N0;j++)
-			{
-				if(j!=i)
-				{
-					int jn=HYPER[i].NEI[j];
-					lambda_d+=(HYPER1[i*h_num+jn].aiin[A_X]*HYPER1[i*h_num+jn].aiin[A_X]+HYPER1[i*h_num+jn].aiin[A_Y]*HYPER1[i*h_num+jn].aiin[A_Y]+HYPER1[i*h_num+jn].aiin[A_Z]*HYPER1[i*h_num+jn].aiin[A_Z])*HYPER1[i*h_num+jn].wiin;
-					lambda_n+=HYPER1[i*h_num+jn].wiin;
-				}
-			}
-		}
-		HYPER[0].laplacian_lambda=lambda_d/lambda_n;
-	}
-
-	double lambda=HYPER[0].laplacian_lambda;
+	double lambda=calclambda(CON);
 	ofstream fv("viscousity.csv",ios::app);
 	if(t==1)
 	{
@@ -42,6 +21,7 @@ void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER
 		fv<<endl;
 	}
 	fv<<t<<",";
+
 	for(int i=0;i<h_num-r_num;i++)
 	{
 		int Nh=0;
