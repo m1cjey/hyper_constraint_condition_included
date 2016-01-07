@@ -407,8 +407,8 @@ void MPSTOFEM3D_droplet(mpsconfig &CON,int *node_num,vector<point3D> &NODE,vecto
     }////////////*/
 
 	/*///////表面粒子の法線ﾍﾞｸﾄﾙ
-    double *direct[DIMENTION];
-    for(int D=0;D<DIMENTION;D++) direct[D]=new double [fluid_number];
+    double *direct[DIMENSION];
+    for(int D=0;D<DIMENSION;D++) direct[D]=new double [fluid_number];
     
   //  double inpoint[3];	//FEMに送る内部節点座標(X,Y,Z)
 	int count=0;			
@@ -421,7 +421,7 @@ void MPSTOFEM3D_droplet(mpsconfig &CON,int *node_num,vector<point3D> &NODE,vecto
 			//if(count%2==0)//間引き
 			{
 				direct_f(CON,PART,i,direct);
-				for(int D=0;D<DIMENTION;D++) direct[D][i]*=-1;//外向き法線ﾍﾞｸﾄﾙが欲しいから符合をかえる
+				for(int D=0;D<DIMENSION;D++) direct[D][i]*=-1;//外向き法線ﾍﾞｸﾄﾙが欲しいから符合をかえる
 				
 				for(int n=1;n<=4;n+=1)
 				{   
@@ -436,7 +436,7 @@ void MPSTOFEM3D_droplet(mpsconfig &CON,int *node_num,vector<point3D> &NODE,vecto
 			}
 		}
 	}
-	for(int D=0;D<DIMENTION;D++) delete [] direct[D];
+	for(int D=0;D<DIMENSION;D++) delete [] direct[D];
 	//////*/
 
 	if(CON.get_region_shape()==0)

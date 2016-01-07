@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>HYPER1,int rigid_number,int t)
+void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>HYPER1,int rigid_number,int t, double lambda)
 {
 	cout<<"”S«€ŒvŽZ";
 	double v=CON.get_vis();
@@ -9,7 +9,7 @@ void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER
 	int r_num=rigid_number;
 	int d=3;
 	double mi=CON.get_hyper_density()*get_volume(&CON);
-	double lambda=calclambda(CON);
+
 	ofstream fv("viscousity.csv",ios::app);
 	if(t==1)
 	{
