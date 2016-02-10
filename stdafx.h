@@ -2,15 +2,13 @@
 // 参照回数が多く、かつあまり変更されない、プロジェクト専用のインクルード ファイル
 // を記述します。
 //
+
+
+
+
 #pragma once
 
-using namespace std;
-
-#define _CRTDBG_MAP_ALLOC//メモリリーク検出用
-#include <stdlib.h>
-#include <crtdbg.h>//メモリリーク検出用
-#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)//メモリリーク検出用
-
+#include "targetver.h"
 
 #include <stdio.h>
 #include <tchar.h>
@@ -32,7 +30,7 @@ using namespace std;
 #include <sstream>
 #include <omp.h>
 
-#include "targetver.h"
+
 #include "tetgen.h"
 #include "define.h"
 #include "CONFIG.h"
@@ -48,6 +46,10 @@ using namespace std;
 
 // TODO: プログラムに必要な追加ヘッダーをここで参照してください。
 
+#define _CRTDBG_MAP_ALLOC//メモリリーク検出用
+#include <stdlib.h>
+#include <crtdbg.h>//メモリリーク検出用
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)//メモリリーク検出用
 
 
 

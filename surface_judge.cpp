@@ -135,7 +135,9 @@ void freeon(mpsconfig &CON, vector<mpselastic> &PART, double n0_4,int *INDEX,int
 	for(int i=0;i<PART.size();i++)
 	{
 		PART[i].PND=0;
+		PART[i].PND2=0;
 		PART[i].N=0;
+		PART[i].N2=0;
 		PART[i].reset_current_distancebps();
 		PART[i].reset_current_neighboursID();
 		PART[i].reset_current_neighbours_position();
@@ -143,10 +145,11 @@ void freeon(mpsconfig &CON, vector<mpselastic> &PART, double n0_4,int *INDEX,int
 
 		////粒子数密度測定
 		double pnd=0;	//全粒子を考慮にいれた粒子数密度
+		double pnd2=0;	//弾性体計算用粒子数密度
 		double pnd4=0;	//表面判定用
 		double sum=0;
 		int N=0;		//周辺粒子数
-		
+			
 		//空間に固有のID(INDEX, MESH)と粒子に固有のID(PART[i].index, PART[i].NEI[N])を照合して探索する
 		for(int I=PART[i].index-1;I<=PART[i].index+1;I++)
 		{
@@ -195,6 +198,8 @@ void freeon(mpsconfig &CON, vector<mpselastic> &PART, double n0_4,int *INDEX,int
 		}
 		PART[i].PND=pnd;	//iの影響半径内に含まれる粒子数密度を取得
 		PART[i].N=N;		//iの影響半径内に含まれる周辺粒子数を取得
+
+
 	}//全粒子の表面判定が終了
 
 //最小粒子間距離をもとめる

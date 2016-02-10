@@ -1,4 +1,6 @@
 ////initial for MPS
+using namespace std;
+
 double kernel(double r,double dis); //重み関数
 double kernel2(double r,double dis,double d); //重み関数
 double kernel3(double r,double dis);
@@ -15,7 +17,7 @@ void culan(mpsconfig *CON,vector<mpsparticle> &PART,int fluid_number,int t,doubl
 ///
 
 //粒子数カウント関数 & 並び替え
-void calc_numbers_of_particles_and_change_the_order(mpsconfig *CON, vector <mpselastic> &PART, int *fluid_number,int *hyper_number,int *magnetic_number,int *rigid_number,int *out,int *order_sw);	//main_another仕様	15/2/10
+void calc_numbers_of_particles_and_change_the_order(mpsconfig *CON, vector <mpselastic> &PART, int *fluid_number,int *hyper_number,int *magnetic_number,int *out,int *order_sw);	//main_another仕様	15/2/10
 //void calc_numbers_of_particles_and_change_the_order(mpsconfig *CON, vector <mpselastic> &PART, int *fluid_number,int *out,int *order_sw);	//main仕様	15/2/10
 int check_position(mpsconfig *CON,vector<mpselastic> &PART, int fluid_number, int *particle_number);
 
@@ -139,7 +141,7 @@ void move_particle(mpsconfig *CON,vector<mpselastic> &PART,int particle_number,i
 
 //非対称行列解法
 void BiCGStab_method(mpsconfig *CON,double *r,int pn,double *X,int *countN,double EP,double **A);
-void BiCGStab2_method(mpsconfig *CON,double *r,int pn,double *X,int *countN,double EP,double **A);
+//void BiCGStab2_method(mpsconfig *CON,double *r,int pn,double *X,int *countN,double EP,double **A);
 
 //高レベル関数
 double get_Legendre(int l,int m,double x);
@@ -204,16 +206,17 @@ void check_FEM_flag(mpsconfig &CON, elastic &ELAST, double ave_P);
 
 
 //超弾性
-void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int rigid_number,int t,double lambda,double **F);
+void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t,double **F);
+void calc_hyper_w(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t,double **F);
+
 
 //粘性項計算
-//void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>&HYPER1,int hyper_number,int t);
-void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>HYPER1,int rigid_number,int t,double lambda);
+void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>HYPER1,int rigid_number,int t);
 void calc_spl_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic2>&HYPER1,int hyper_number);
 
 //応力出力関数
 void force_movie_AVS(mpsconfig *CON,int t,vector<mpselastic> &PART,int particle_number,double m);
 
 //磁気モーメント法
+void Magnetic_Moment_Method(mpsconfig &CON,vector<mpselastic>&PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);
 void Magnetic_Moment_Methodv2(mpsconfig &CON,vector<mpselastic> &PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);
-void Magnetic_Moment_Method(mpsconfig &CON,vector<mpselastic> &PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);

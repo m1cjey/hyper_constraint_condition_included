@@ -43,7 +43,7 @@ public:
 	double h;				//エンタルピー
 	double PND;				//reを用いた粒子数密度
 	double PND2;
-	double PND0;
+	double PND0;		
 	double val;					//その都度適当な値の格納に利用
 	double eforce[DIMENSION];	//電磁力
 
@@ -68,7 +68,6 @@ public:
 	//PND=particle_number_density
 	void set_PND(const double pnd){PND=pnd;}
 	double get_PND() const{return PND;}
-
 	double F[DIMENSION];
 };
 
