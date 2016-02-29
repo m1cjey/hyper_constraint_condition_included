@@ -37,6 +37,8 @@ public:
 	double n0ij[DIMENSION];
 	double spl_f;
 
+	double wij;
+	double d_wij;
 	hyperelastic2();
 };
 
