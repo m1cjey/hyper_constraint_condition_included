@@ -21,6 +21,7 @@ public:
 	double t_inverse_Fi[DIMENSION][DIMENSION];
 	double J;
 	double pnd;
+	double pnd0;
 	double Fi[DIMENSION][DIMENSION];
 	double vis_force[DIMENSION];
 	double vec_norm[DIMENSION];
