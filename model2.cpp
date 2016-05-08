@@ -914,12 +914,14 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 				 }
 			 }
 		 }
-		 for(int i=0;i<num;i++)writedata2(fq,num,X[i]-ls*le/2,Y[i]-ls*le/2,Z[i]+3*le,ELASTIC,1,1,val,0,0,0,0,0,0,0,0,0);			 
-		 for(int i=0;i<num2;i++)writedata2(fq,num2+num,X2[i]-ls*le/2,Y2[i]-ls*le/2,Z2[i]+3*le,MAGELAST,1,1,val,0,0,0,0,0,0,0,0,1);
+/*		 for(int i=0;i<num;i++)writedata2(fq,num,X[i]-ls*le/2,Y[i]-ls*le/2,Z[i]+3*le,ELASTIC,1,1,val,0,0,0,0,0,0,0,0,0);			 
+		 for(int i=0;i<num2;i++)writedata2(fq,num2+num,X2[i]-ls*le/2,Y2[i]-ls*le/2,Z2[i]+3*le,MAGELAST,1,1,val,0,0,0,0,0,0,0,0,1);*/
+		 for(int i=0;i<num;i++)writedata2(fq,num,X[i]-ls*le/2,Y[i]-ls*le/2,Z[i],ELASTIC,1,1,val,0,0,0,0,0,0,0,0,0);			 
+		 for(int i=0;i<num2;i++)writedata2(fq,num2+num,X2[i]-ls*le/2,Y2[i]-ls*le/2,Z2[i],MAGELAST,1,1,val,0,0,0,0,0,0,0,0,1);
 		 number+=num+num2;
 		 cout<<"モデル完成\n";
 
-		 for(int i=0;i<lw;i++)
+/*		 for(int i=0;i<lw;i++)
 		 {
 			for(int j=0;j<lw;j++)
 			{
@@ -940,15 +942,15 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			}
 		 }
 		 number+=num3;
-		 cout<<"壁完成\n";
+		 cout<<"壁完成\n";*/
 
 	 }
 	 ////////////////////////////////モデル18　実機////////////////////////////////////////////////
 	 else if(model==18)
 	 {
 		 double h=2;
-		 double lm=8.7;
-		 double ls=17.3;
+		 double lm=4.5;
+		 double ls=9;
 		 double flag_model=1;
 
 		 int num=0;
@@ -1026,7 +1028,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 		 cout<<"モデル完成\n";
  		 number=num+num2;
 		 ///////////////////////下壁作成///////////////////
-		 double Rw=14*le;
+/*		 double Rw=14*le;
 		 double hw=3*le;
 		 int number2=0;
 		 int ii=0;
@@ -1047,7 +1049,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			 }
 		 }
 		 cout<<"壁完成\n";
-		 number+=ii;
+		 number+=ii;*/
 	 }
 	 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	 
@@ -1229,19 +1231,19 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 	 /////////////////////////////////ただの立方体////////////////////////////////////
 	 else if(model==23)
 	 {
-		int height=3;
-		int base=3;
+		int height=9;
+		int base=9;
 		vector<int>suf;
 		vector<int>num;
 		//writedata2内決め打ち有
 
 		double le2=le*sqrt(2.0);
 
-		 for(int k=0;k<height*2-1;k++)
+		 for(int k=0;k<height;k++)
 		 {
 			 if(k%2==0)
 			 {
-				 for(int i=0;i<base*2-1;i++)
+				 for(int i=0;i<base*2;i++)
 				 {
 					 if(i%2==0)
 					 {
@@ -1271,7 +1273,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			 }
 			 else
 			{
-				 for(int i=0;i<base*2-1;i++)
+				 for(int i=0;i<base*2;i++)
 				 {
 					 if(i%2==1)
 					 {
@@ -1300,17 +1302,82 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 				}
 			 }
 		 }
-		 for(int i=0;i<number;i++)	writedata2(fq,i,(X[i]-(base-1)/2)*le2,(Y[i]-(base-1)/2)*le2,(Z[i]+1)*le2,HYPERELAST,1,suf[i],0,0,0,0,0,0,0,0,0,ON);
-
-		 cout<<"超弾性体完成\n";
+		 for(int i=0;i<number;i++)	writedata2(fq,i,(X[i]-base/2+0.5)*le2,(Y[i]-base/2+0.5)*le2,Z[i]*le2,ELASTIC,1,suf[i],0,0,0,0,0,0,0,0,0,OFF);
 		 
-
-		int number2=0;
+		 int number2=0;
+		 for(int k=height;k<height*2;k++)
+		 {
+			 if(k%2==0)
+			 {
+				 for(int i=0;i<base*2;i++)
+				 {
+					 if(i%2==0)
+					 {
+						 for(int j=0;j<base;j++)
+						 {
+							 X.push_back(i*0.5);
+							 Y.push_back(j);
+							 Z.push_back(k*0.5);
+							if(i==0||j==0||k==0||i==base-1||j==base-1||k==height*2-2) suf.push_back(1);
+							else suf.push_back(0);
+							number2++;
+						 }
+					 }
+					 else 
+					 {
+						 for(int j=0;j<base-1;j++)
+						 {
+							X.push_back(i*0.5);
+							Y.push_back(j+0.5);
+							Z.push_back(k*0.5);
+							if(i==0||j==0||k==0||i==base-1||j==base-1||k==height*2-2) suf.push_back(1);
+							else suf.push_back(0);
+							number2++;
+						 }
+					 }
+				 }
+			 }
+			 else
+			{
+				 for(int i=0;i<base*2;i++)
+				 {
+					 if(i%2==1)
+					 {
+						 for(int j=0;j<base;j++)
+						 {
+							 X.push_back(i*0.5);
+							 Y.push_back(j);
+							 Z.push_back(k*0.5);
+							if(i==0||j==0||k==0||i==base-1||j==base-1||k==height*2-2) suf.push_back(1);
+							else suf.push_back(0);
+							number2++;
+						 }
+					 }
+					 else 
+					 {
+						 for(int j=0;j<base-1;j++)
+						 {
+							X.push_back(i*0.5);
+							Y.push_back(j+0.5);
+							Z.push_back(k*0.5);
+							if(i==0||j==0||k==0||i==base-1||j==base-1||k==height*2-2) suf.push_back(1);
+							else suf.push_back(0);
+							number2++;
+						 }
+					 }
+				}
+			 }
+		 }
+		 for(int i=number;i<number2+number;i++)	writedata2(fq,i,(X[i]-base/2+0.5)*le2,(Y[i]-base/2+0.5)*le2,Z[i]*le2,MAGELAST,1,suf[i],0,0,0,0,0,0,0,0,0,ON);
+		 number+=number2;
+		 cout<<"超弾性体完成\n";
+		 /*
+		 int number2=0;
 	 	int number3=0;
-		int w_base=6;
-		vector<int> w_suf;
-		for(int k=0;k<3*2-1;k++)
-		{
+		 int w_base=4;
+		 vector<int> w_suf;
+		 for(int k=0;k<3*2-1;k++)
+		 {
 			 if(k%2==0)
 			 {
 				 for(int i=0;i<w_base*2-1;i++)
@@ -1372,11 +1439,9 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 				 }
 			 }
 		 }
-		 for(int i=0;i<number2;i++)		 writedata2(fq,i+number,(X2[i]-(w_base-1)/2)*le2,(Y2[i]-(w_base-1)/2)*le2,(Z2[i]-2)*le2,WALL,1,w_suf[i],0,0,0,0,0,0,0,0,0,0);
+		 for(int i=0;i<number2;i++)		 writedata2(fq,i+number,(X2[i]-1.5)*le2,(Y2[i]-1.5)*le2,(Z2[i]-2.0)*le2,WALL,1,w_suf[i],0,0,0,0,0,0,0,0,0,0);
 		 cout<<"number2"<<number2<<endl;
-		number+=number2;
-		
-		/*
+		number+=number2;/*
 		for(int k=0;k<3*2-1;k++)
 		 {
 			if(k%2==0)
@@ -1423,7 +1488,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			}
 		}
  		 for(int i=0;i<number3;i++)		 writedata2(fq,i+number2+number,(X3[i]-2.5)*le,(Y3[i]-2.5)*le,(Z3[i]-1.0+6.0)*le,WALL,1,0,0,0,0,-10.0*le,0,0,0,0,0,0);
-		 cout<<"number3"<<number3<<endl;//*/
+		 cout<<"number3"<<number3<<endl;*/
 		 		 
 		 //number+=number2+number3;
 		 cout<<"壁完成\n";
