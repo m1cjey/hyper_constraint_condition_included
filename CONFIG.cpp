@@ -19,8 +19,8 @@ mpsconfig::mpsconfig()
 	ss>>step;
 	fin.close();*/
 	
-	step=20000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
-	switch_FEM=true;		//FEMを実行するかしないか false
+	step=10000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
+	switch_FEM=false;		//FEMを実行するかしないか false
 	nonlinear_elastic=false;	//弾性体非線形計算するかtrue
 	switch_vis=ON;			//粘性項計算するかしないか・・・これはあとで消す
 	FEMCG=2;				//FEMにおける行列解法 0:CG 1:ICCG 2:並列ICCG 3:MRTR 4:ICMRTR

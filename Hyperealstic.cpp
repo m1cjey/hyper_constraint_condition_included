@@ -1,17 +1,17 @@
 #include "stdafx.h"	
 
-void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,bool repetation,double **F,int bottom_num);
+void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,bool repetation,double **F);
 void renew_lambda(mpsconfig &CON,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int t);
 void calc_differential_p(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F);
 void calc_transposed_inverse_matrix(double **M,bool transport,bool inversion);
 double calc_det(double **M,int N);
 double calc_det3(double **M);
 void calc_stress(mpsconfig &CON,vector<hyperelastic> &HYPER);
-void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int &bottom_num);
+void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1);
 void calc_inverse_matrix_for_NR(int N, double *a);
-void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int t,double **F,int bottom_num);
-void calc_F(vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1);
-void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> HYPER,vector<hyperelastic2> HYPER1,double *lambda,double *fx,double *DfDx,int hyper_number,int count,int t,double **F,int bottom_num);
+void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int t,double **F);
+void calc_F(mpsconfig &CON, vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1);
+void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> HYPER,vector<hyperelastic2> HYPER1,double *lambda,double *fx,double *DfDx,int hyper_number,int count,int t,double **F);
 void inverse(double **a,int N);
 void ludcmp(double **a,int N,int *index,double *d);
 void lubksb(double **a,int N,int *index,double b[]);
@@ -31,7 +31,7 @@ void iccg2(mpsconfig *CON,double *val,int *ind,int *ptr,int pn,double *B,int num
 void CG3D(mpsconfig *CON,double *val,int *ind,int *ptr,int pn,double *B,int number,double *X);
 void GaussSeidelvh(double *A, int pn, double *b,double ep);
 
-void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t,double **F,int &bottom_num)
+void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t,double **F)
 {	
 	ofstream time("time_log.dat",ios::app);
 	clock_t	start_t=clock();
@@ -51,7 +51,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		for(int i=0;i<h_num;i++)	for(int D=0;D<DIMENSION;D++)	PART[i].q0[D]=0;
 		for(int i=0;i<h_num;i++)	for(int D=0;D<DIMENSION;D++)	PART[i].q0[D]=PART[i].r[D];
 		for(int k=p_num-h_num+1;k<p_num;k++)	if(max_h<PART[k].r[A_Z])	max_h=PART[k].r[A_Z];
-		calc_constant(CON,PART,HYPER,HYPER1,bottom_num);
+		calc_constant(CON,PART,HYPER,HYPER1);
 		calc_stress(CON,HYPER);
 	}
 	
@@ -66,13 +66,13 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	}
 
 
-	newton_raphson(CON,PART,HYPER,HYPER1,t,F,bottom_num);
+	newton_raphson(CON,PART,HYPER,HYPER1,t,F);
 
-	calc_half_p(CON,PART,HYPER,HYPER1,0,F,bottom_num);
+	calc_half_p(CON,PART,HYPER,HYPER1,0,F);
 
 //	for(int i=0;i<p_num;i++)	cout<<"r["<<i<<"]={"<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<"}"<<endl;
 
-	calc_F(PART,HYPER,HYPER1);
+	calc_F(CON,PART,HYPER,HYPER1);
 
 	calc_stress(CON,HYPER);
 	
@@ -84,7 +84,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 //	for(int i=0;i<p_num;i++)	cout<<"renew_lambda"<<i<<"="<<HYPER[i].lambda<<endl;
 
-	calc_half_p(CON,PART,HYPER,HYPER1,1,F,bottom_num);
+	calc_half_p(CON,PART,HYPER,HYPER1,1,F);
 	
 //	for(int i=0;i<p_num;i++)	cout<<"renew_p_x"<<i<<"="<<HYPER[i].p[A_X]<<endl;
 	cout<<"Hypercalculation ends."<<endl;
@@ -94,7 +94,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	time.close();
 }
 
-void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int &bottom_num)
+void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1)
 {
 //	cout<<"èâä˙ílåvéZ";
 
@@ -106,18 +106,6 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 	int h_num=HYPER.size();
 	int model=CON.get_model_number();
 //	cout<<"V"<<V<<endl;
-
-	//íÍñ ÇÃZç¿ïWÇ∆ó±éqêîÇÃíTçı
-	double min=PART[0].q0[A_Z];
-	for(int i=1;i<h_num;i++)
-	{
-		if(PART[i].q0[A_Z]<=min)	bottom_num++;
-		else
-		{
-			break;
-		}
-		//cout<<"i"<<i<<endl;
-	}
 
 	////èâä˙â^ìÆó 
 	//ã»Ç∞ÇÀÇ∂ÇË
@@ -246,8 +234,6 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 			HYPER1[i*h_num+j].wiin=wiin;
 		}
 		HYPER[i].N=N;
-		cout<<"num["<<i<<"]="<<HYPER[i].N<<" ";
-		cout<<"pnd["<<i<<"]="<<HYPER[i].pnd<<endl;
 	}
 	
 
@@ -268,7 +254,6 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 		Ai[2][0]=0;	Ai[2][1]=0;	Ai[2][2]=0;
 
 		int Ni=HYPER[i].N;
-		double a[DIMENSION];
 		for(int j=0;j<Ni;j++)	
 		{
 			int k=HYPER[i].NEI[j];
@@ -347,6 +332,7 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 	}
 		
 	////DgDqÇÃåvéZ
+	int p_num=PART.size();
 	for(int i=0;i<h_num;i++)
 	{
 		int Ni=HYPER[i].N;
@@ -358,19 +344,38 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 			HYPER1[k*h_num+i].DgDq[A_Z]=HYPER[k].J*(HYPER[k].t_inverse_Fi[A_Z][0]*HYPER1[i*h_num+k].n0ij[0]+HYPER[k].t_inverse_Fi[A_Z][1]*HYPER1[i*h_num+k].n0ij[1]+HYPER[k].t_inverse_Fi[A_Z][2]*HYPER1[i*h_num+k].n0ij[2]);		
 //			cout<<"DgDq["<<k<<","<<i<<"]="<<HYPER1[k*h_num+i].DgDq[A_X]<<","<<HYPER1[k*h_num+i].DgDq[A_Y]<<","<<HYPER1[k*h_num+i].DgDq[A_Z]<<endl;
 		}
+
 		HYPER1[i*h_num+i].DgDq[A_X]=HYPER[i].J*(HYPER[i].t_inverse_Fi[A_X][0]*HYPER1[i*h_num+i].n0ij[0]+HYPER[i].t_inverse_Fi[A_X][1]*HYPER1[i*h_num+i].n0ij[1]+HYPER[i].t_inverse_Fi[A_X][2]*HYPER1[i*h_num+i].n0ij[2]);
 		HYPER1[i*h_num+i].DgDq[A_Y]=HYPER[i].J*(HYPER[i].t_inverse_Fi[A_Y][0]*HYPER1[i*h_num+i].n0ij[0]+HYPER[i].t_inverse_Fi[A_Y][1]*HYPER1[i*h_num+i].n0ij[1]+HYPER[i].t_inverse_Fi[A_Y][2]*HYPER1[i*h_num+i].n0ij[2]);
 		HYPER1[i*h_num+i].DgDq[A_Z]=HYPER[i].J*(HYPER[i].t_inverse_Fi[A_Z][0]*HYPER1[i*h_num+i].n0ij[0]+HYPER[i].t_inverse_Fi[A_Z][1]*HYPER1[i*h_num+i].n0ij[1]+HYPER[i].t_inverse_Fi[A_Z][2]*HYPER1[i*h_num+i].n0ij[2]);
 //		cout<<"DgDq["<<i<<","<<i<<"]="<<HYPER1[i*h_num+i].DgDq[A_X]<<","<<HYPER1[i*h_num+i].DgDq[A_Y]<<","<<HYPER1[i*h_num+i].DgDq[A_Z]<<endl;
+
+		//ê⁄êGçló∂
+		double part_dgdq_x=0;
+		double part_dgdq_y=0;
+		double part_dgdq_z=0;
+		for(int k=p_num-h_num;k<p_num;k++)
+		{
+			double dis=sqrt((PART[k].r[A_X]-PART[i].r[A_X])*(PART[k].r[A_X]-PART[i].r[A_X])+(PART[k].r[A_Y]-PART[i].r[A_Y])*(PART[k].r[A_Y]-PART[i].r[A_Y])+(PART[k].r[A_Z]-PART[i].r[A_Z])*(PART[k].r[A_Z]-PART[i].r[A_Z]));
+			if(dis<r)
+			{
+				double d_wij=-r/dis/dis;
+				part_dgdq_x+=-1/HYPER[i].pnd*d_wij*(PART[k].r[A_X]-PART[i].r[A_X])/dis;
+				part_dgdq_y+=-1/HYPER[i].pnd*d_wij*(PART[k].r[A_Y]-PART[i].r[A_Y])/dis;
+				part_dgdq_z+=-1/HYPER[i].pnd*d_wij*(PART[k].r[A_Z]-PART[i].r[A_Z])/dis;
+			}
+		}
+		HYPER1[i*h_num+i].DgDq[A_X]+=part_dgdq_x;
+		HYPER1[i*h_num+i].DgDq[A_Y]+=part_dgdq_y;
+		HYPER1[i*h_num+i].DgDq[A_Z]+=part_dgdq_z;
 	}	
 //	cout<<"----------OK"<<endl;
-
 
  }
 
 
 /////ÉjÉÖÅ[ÉgÉìÉâÉtÉ\Éìñ@ 
-void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int t,double **F,int bottom_num)
+void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int t,double **F)
 {
 	/////fx(N*NçsóÒÇÃäeê¨ï™)ÇÕ1éüå≥îzóÒÇ≈äiî[ÅA(i,j)ê¨ï™Ç»ÇÁ[j*N+i]Ç≈éQè∆
 	/////DfDx(N*NçsóÒÇÃäeê¨ï™)ÇÕ1éüå≥îzóÒÇ≈äiî[ÅA(i,j)ê¨ï™Ç»ÇÁ[j*N+i]Ç≈éQè∆
@@ -425,7 +430,7 @@ void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> 
 
 //		if(count==1)	for(int i=0;i<h_num;i++)	for(int j=0;j<h_num;j++)	for(int D=0;D<DIMENSION;D++)	HYPER1[i*h_num+j].newton_DgDq[D]=HYPER1[i*N+j].DgDq[D];
 
-		calc_newton_function(CON,PART,HYPER,HYPER1,XX,fx,DfDx,h_num,count,t,F,bottom_num);
+		calc_newton_function(CON,PART,HYPER,HYPER1,XX,fx,DfDx,h_num,count,t,F);
 
 
 /*		//åªç›ÇÃä÷êîílÇãÅÇﬂÇÈ
@@ -560,7 +565,7 @@ void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> 
 }
 
 
-void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> HYPER,vector<hyperelastic2> HYPER1,double *lambda,double *fx,double *DfDx,int hyper_number,int count,int t,double **F,int bottom_num)
+void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> HYPER,vector<hyperelastic2> HYPER1,double *lambda,double *fx,double *DfDx,int hyper_number,int count,int t,double **F)
 {
 	clock_t t3=clock();
 
@@ -573,6 +578,7 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 	double V=get_volume(&CON);
 	double mi=V*CON.get_hyper_density();
 	double density=CON.get_hyper_density();
+	double G=98;
 	double *n_rx=new double[h_num];
 	double *n_ry=new double[h_num];
 	double *n_rz=new double[h_num];
@@ -670,7 +676,7 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 			p_half_p[A_Z]+=HYPER[i].stress[2][0]*HYPER1[i*h_num+i].DgDq[0]+HYPER[i].stress[2][1]*HYPER1[i*h_num+i].DgDq[1]+(HYPER[i].stress[2][2]-lambda[i])*HYPER1[i*h_num+i].DgDq[2];
 		
 			//èdóÕÇÃâeãø
-			if(flag_G==ON)	p_half_p[A_Z]-=9.8*mi;
+			if(flag_G==ON)	p_half_p[A_Z]-=G*mi;
 			//îSê´çÄÇÃâeãø
 			if(flag_vis==ON)
 			{
@@ -686,17 +692,16 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 				p_half_p[A_Z]+=F[A_Z][i]*V;//density;
 			}
 			//à íuç¿ïWÇÃåvéZ
-			if(i>=bottom_num)
-			{
-				n_rx[i]+=Dt*(HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X])/mi;
-				n_ry[i]+=Dt*(HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y])/mi;
-				n_rz[i]+=Dt*(HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z])/mi;
-			}
+			n_rx[i]+=Dt*(HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X])/mi;
+			n_ry[i]+=Dt*(HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y])/mi;
+			n_rz[i]+=Dt*(HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z])/mi;
 		}
 	}
 
 
 	////DgDqÇ∆fxÇÃçXêV
+	int p_num=PART.size();
+	double r=CON.get_h_dis();
 	for(int i=0;i<h_num;i++)
 	{
 		//FiÇÃåvéZ
@@ -729,14 +734,34 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 		p_Fi[2][1]=fi[2][0]*HYPER[i].inverse_Ai[0][1]+fi[2][1]*HYPER[i].inverse_Ai[1][1]+fi[2][2]*HYPER[i].inverse_Ai[2][1];
 		p_Fi[2][2]=fi[2][0]*HYPER[i].inverse_Ai[0][2]+fi[2][1]*HYPER[i].inverse_Ai[1][2]+fi[2][2]*HYPER[i].inverse_Ai[2][2];
 
+		//t_inverse_FiÇÃåvéZ
+		inverse(p_Fi,DIMENSION);
+
 		//JÇÃåvéZ
 		double J=calc_det3(p_Fi);
 
-		//fxÇÃåvéZ
-		fx[i]=V*(1-J);//1-J;//
+		double part_dgdq_x=0;
+		double part_dgdq_y=0;
+		double part_dgdq_z=0;
 
-		//t_inverse_FiÇÃåvéZ
-		inverse(p_Fi,DIMENSION);
+		double part_g=0;
+
+		for(int k=p_num-h_num;k<p_num;k++)
+		{
+			double dis=sqrt((n_rx[k]-n_rx[i])*(n_rx[k]-n_rx[i])+(n_ry[k]-n_ry[i])*(n_ry[k]-n_ry[i])+(n_rz[k]-n_rz[i])*(n_rz[k]-n_rz[i]));
+			if(dis<r)
+			{
+				part_g+=kernel4(r,dis)/HYPER[i].pnd;
+				double d_wij=-r/dis/dis;
+				part_dgdq_x+=-1/HYPER[i].pnd*d_wij*(n_rx[k]-n_rx[i])/dis;
+				part_dgdq_y+=-1/HYPER[i].pnd*d_wij*(n_ry[k]-n_ry[i])/dis;
+				part_dgdq_z+=-1/HYPER[i].pnd*d_wij*(n_rz[k]-n_rz[i])/dis;
+			}
+		}
+
+		//fxÇÃåvéZ
+		fx[i]=V*(1-J-part_g);//1-J;//
+
 
 		//DgDqÇÃåvéZ
 		for(int j=0;j<Ni;j++)
@@ -751,6 +776,10 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 		n_DgDq_x[i][i]=J*(p_Fi[0][0]*HYPER1[i*h_num+i].n0ij[0]+p_Fi[1][0]*HYPER1[i*h_num+i].n0ij[1]+p_Fi[2][0]*HYPER1[i*h_num+i].n0ij[2]);
 		n_DgDq_y[i][i]=J*(p_Fi[0][1]*HYPER1[i*h_num+i].n0ij[0]+p_Fi[1][1]*HYPER1[i*h_num+i].n0ij[1]+p_Fi[2][1]*HYPER1[i*h_num+i].n0ij[2]);
 		n_DgDq_z[i][i]=J*(p_Fi[0][2]*HYPER1[i*h_num+i].n0ij[0]+p_Fi[1][2]*HYPER1[i*h_num+i].n0ij[1]+p_Fi[2][2]*HYPER1[i*h_num+i].n0ij[2]);
+
+		n_DgDq_x[i][i]+=part_dgdq_x;
+		n_DgDq_y[i][i]+=part_dgdq_y;
+		n_DgDq_z[i][i]+=part_dgdq_z;
 
 //		cout<<"n_DgDq["<<i<<"*p_num+"<<i<<"]={"<<n_DgDq_x[i][i]<<","<<n_DgDq_y[i][i]<<","<<n_DgDq_z[i][i]<<"}"<<endl;
 //		cout<<"fx["<<i<<"]="<<fx[i]<<endl;
@@ -816,7 +845,7 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 	delete[]	n_rz;
 }
 
-void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,bool repetation,double **F,int bottom_num)
+void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,bool repetation,double **F)
 {
 //	if(repetation==0)	cout<<"âºÇÃâ^ìÆó Åïà íuç¿ïWåvéZ";
 //	else	cout<<"â^ìÆó åvéZ";
@@ -826,6 +855,7 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 	double le=CON.get_distancebp();
 	double V=get_volume(&CON);
 	double mi=V*CON.get_hyper_density();
+	double G=98;
 	int flag_vis=CON.get_flag_vis();
 	bool flag_FEM=CON.get_FEM_flag();
 	int flag_G=CON.get_flag_G();
@@ -848,7 +878,7 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 		p_half_p[A_Z]+=HYPER[i].stress[2][0]*HYPER1[i*h_num+i].DgDq[0]+HYPER[i].stress[2][1]*HYPER1[i*h_num+i].DgDq[1]+(HYPER[i].stress[2][2]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq[2];
 
 		//èdóÕçÄ
-		if(flag_G==ON)	p_half_p[A_Z]-=9.8*mi;
+		if(flag_G==ON)	p_half_p[A_Z]-=G*mi;
 		//îSê´çÄ
 		if(flag_vis==ON)
 		{
@@ -894,12 +924,9 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 				}
 			}
 			else*/
-			if(i>=bottom_num)
-			{
-				PART[i].r[A_X]+=Dt*HYPER[i].half_p[A_X]/mi;
-				PART[i].r[A_Y]+=Dt*HYPER[i].half_p[A_Y]/mi;
-				PART[i].r[A_Z]+=Dt*HYPER[i].half_p[A_Z]/mi;				
-			}
+			PART[i].r[A_X]+=Dt*HYPER[i].half_p[A_X]/mi;
+			PART[i].r[A_Y]+=Dt*HYPER[i].half_p[A_Y]/mi;
+			PART[i].r[A_Z]+=Dt*HYPER[i].half_p[A_Z]/mi;				
 		}
 		else
 		{
@@ -921,7 +948,7 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 //	cout<<"----------OK"<<endl;
 }
 
-void calc_F(vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1)
+void calc_F(mpsconfig &CON, vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1)
 {
 //	cout<<"FiåvéZ";
 	////FiÇÃçXêV
@@ -977,6 +1004,8 @@ void calc_F(vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelas
 	delete[]	p_Fi;
 
 	//calculation of DgDq
+	int p_num=PART.size();
+	double r=CON.get_h_dis();
 	for(int i=0;i<h_num;i++)
 	{
 		int Ni=HYPER[i].N;
@@ -992,6 +1021,24 @@ void calc_F(vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelas
 		HYPER1[i*h_num+i].DgDq[A_Y]=HYPER[i].J*(HYPER[i].t_inverse_Fi[A_Y][0]*HYPER1[i*h_num+i].n0ij[0]+HYPER[i].t_inverse_Fi[A_Y][1]*HYPER1[i*h_num+i].n0ij[1]+HYPER[i].t_inverse_Fi[A_Y][2]*HYPER1[i*h_num+i].n0ij[2]);
 		HYPER1[i*h_num+i].DgDq[A_Z]=HYPER[i].J*(HYPER[i].t_inverse_Fi[A_Z][0]*HYPER1[i*h_num+i].n0ij[0]+HYPER[i].t_inverse_Fi[A_Z][1]*HYPER1[i*h_num+i].n0ij[1]+HYPER[i].t_inverse_Fi[A_Z][2]*HYPER1[i*h_num+i].n0ij[2]);
 		//cout<<"i"<<i<<"j"<<i<<"	"<<HYPER1[i*h_num+i].DgDq[A_X]<<","<<HYPER1[i*h_num+i].DgDq[A_Y]<<","<<HYPER1[i*h_num+i].DgDq[A_Z]<<endl;
+
+		double part_dgdq_x=0;
+		double part_dgdq_y=0;
+		double part_dgdq_z=0;
+		for(int k=p_num-h_num;k<p_num;k++)
+		{
+			double dis=sqrt((PART[k].r[A_X]-PART[i].r[A_X])*(PART[k].r[A_X]-PART[i].r[A_X])+(PART[k].r[A_Y]-PART[i].r[A_Y])*(PART[k].r[A_Y]-PART[i].r[A_Y])+(PART[k].r[A_Z]-PART[i].r[A_Z])*(PART[k].r[A_Z]-PART[i].r[A_Z]));
+			if(dis<r)
+			{
+				double d_wij=-r/dis/dis;
+				part_dgdq_x+=-1/HYPER[i].pnd*d_wij*(PART[k].r[A_X]-PART[i].r[A_X])/dis;
+				part_dgdq_y+=-1/HYPER[i].pnd*d_wij*(PART[k].r[A_Y]-PART[i].r[A_Y])/dis;
+				part_dgdq_z+=-1/HYPER[i].pnd*d_wij*(PART[k].r[A_Z]-PART[i].r[A_Z])/dis;
+			}
+		}
+		HYPER1[i*h_num+i].DgDq[A_X]+=part_dgdq_x;
+		HYPER1[i*h_num+i].DgDq[A_Y]+=part_dgdq_y;
+		HYPER1[i*h_num+i].DgDq[A_Z]+=part_dgdq_z;
 	}
 //	cout<<"----------OK"<<endl;
 
@@ -1074,11 +1121,12 @@ void calc_stress(mpsconfig &CON,vector<hyperelastic> &HYPER)
 void calc_differential_p(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F)
 {
 //	cout<<"â^ìÆó î˜ï™ílåvéZ";
-
+	
 	int h_num=HYPER.size();
 	int flag_vis=CON.get_flag_vis();
 	int flag_G=CON.get_flag_G();
 	int flag_FEM=CON.get_FEM_flag();
+	double G=98;
 	double Dt=CON.get_dt();
 	double V=get_volume(&CON);
 	double mi=V*CON.get_hyper_density();
@@ -1099,7 +1147,7 @@ void calc_differential_p(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelast
 		HYPER[i].differential_p[A_Z]=HYPER[i].half_p[A_Z]+Dt*0.5*(p_differential_p[A_Z]+HYPER[i].stress[A_Z][0]*HYPER1[i*h_num+i].DgDq[0]+HYPER[i].stress[A_Z][1]*HYPER1[i*h_num+i].DgDq[1]+HYPER[i].stress[A_Z][2]*HYPER1[i*h_num+i].DgDq[2]);////p_differential_p[A_Z];////
 		
 		//èdóÕâeãø
-		if(flag_G==ON)	HYPER[i].differential_p[A_Z]-=Dt*0.5*9.8*mi;
+		if(flag_G==ON)	HYPER[i].differential_p[A_Z]-=Dt*0.5*G*mi;
 		if(flag_vis==ON)
 		{
 			HYPER[i].differential_p[A_X]+=Dt*0.5*HYPER[i].vis_force[A_X];

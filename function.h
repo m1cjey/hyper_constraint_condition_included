@@ -206,7 +206,7 @@ void check_FEM_flag(mpsconfig &CON, elastic &ELAST, double ave_P);
 
 
 //í¥íeê´
-void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t,double **F,int &bottom_num);
+void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t,double **F);
 
 
 //îSê´çÄåvéZ
