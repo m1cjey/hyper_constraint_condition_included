@@ -65,6 +65,7 @@ void output_alldata_AVS(mpsconfig *CON,vector<mpsparticle> &PART,int fluid_numbe
 void CG_method(mpsconfig *CON,double *r,double *P,double *AP,double *val,int *ind,int *ptr,int pn,double *X,int *countN,double EP);
 void iccg(mpsconfig *CON,double *val,int *ind,int *ptr,int pn,double *B,int number,double *X,double *r,double *P,double EP,int *count2);
 void gauss(double *matrix,double *B,int N);
+void gauss_vector(vector<double> matrix,vector<double> B,int N);
 void jacobi(double **matrix,double *B,int N);
 
 //îSê´

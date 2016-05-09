@@ -44,6 +44,7 @@ public:
 	double PND;				//reを用いた粒子数密度
 	double PND2;
 	double PND0;		
+	double PNDh;
 	double val;					//その都度適当な値の格納に利用
 	double eforce[DIMENSION];	//電磁力
 
