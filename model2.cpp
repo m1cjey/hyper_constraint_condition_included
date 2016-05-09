@@ -1165,27 +1165,75 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			 {
 				 for(int k=0;k<height;k++)
 				 {
-					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+2)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
+					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+4)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
 					 number++;
 				 }
 			 }
 		 }
-
-		 double w_base=6;
-		 double number2=0;
-		 for(int i=0;i<w_base;i++)
+		 cout<<"model完成\n";
+	
+		 double w_base=12;
+		 double w_height=5;
+		 int number2=0;
+	 
+		 for(int k=0;k<w_height;k++)
 		 {
-			 for(int j=0;j<base;j++)
+			 if(k%2==0)
 			 {
-				 for(int k=0;k<3;k++)
+				 for(int i=0;i<w_base*2;i++)
 				 {
-					 writedata2(fq,number2+number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k-(height-1))*le,WALL,1,0,0,0,0,0,0,0,0,0,0,0);
-					 number2++;
+					 if(i%2==0)
+					 {
+						 for(int j=0;j<w_base;j++)
+						 {
+							 X.push_back(i*0.5);
+							 Y.push_back(j);
+							 Z.push_back(k*0.5);
+							number2++;
+						 }
+					 }
+					 else 
+					 {
+						 for(int j=0;j<w_base-1;j++)
+						 {
+							X.push_back(i*0.5);
+							Y.push_back(j+0.5);
+							Z.push_back(k*0.5);
+							number2++;
+						 }
+					 }
 				 }
 			 }
-		 }		 
+			 else
+			{
+				 for(int i=0;i<w_base*2;i++)
+				 {
+					 if(i%2==1)
+					 {
+						 for(int j=0;j<w_base;j++)
+						 {
+							 X.push_back(i*0.5);
+							 Y.push_back(j);
+							 Z.push_back(k*0.5);
+							number2++;
+						 }
+					 }
+					 else 
+					 {
+						 for(int j=0;j<w_base-1;j++)
+						 {
+							X.push_back(i*0.5);
+							Y.push_back(j+0.5);
+							Z.push_back(k*0.5);
+							number2++;
+						 }
+					 }
+				}
+			 }
+		 }
+		 for(int i=0;i<number2;i++)	writedata2(fq,i+number,(X[i]-w_base/2+0.5)*le,(Y[i]-w_base/2+0.5)*le,(Z[i]-w_height+1)*le,WALL,1,0,0,0,0,0,0,0,0,0,0,OFF);
 		 number+=number2;
-		 cout<<"model完成\n";
+		 cout<<"壁完成\n";
 	 }
 
 	 ///////////////////////////////////////
