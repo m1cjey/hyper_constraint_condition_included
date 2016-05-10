@@ -1165,15 +1165,15 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			 {
 				 for(int k=0;k<height;k++)
 				 {
-					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+4)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
+					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+1)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
 					 number++;
 				 }
 			 }
 		 }
 		 cout<<"model完成\n";
 	
-		 double w_base=12;
-		 double w_height=5;
+/*		 double w_base=6;
+		 double w_height=2;
 		 int number2=0;
 	 
 		 for(int k=0;k<w_height;k++)
@@ -1233,7 +1233,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 		 }
 		 for(int i=0;i<number2;i++)	writedata2(fq,i+number,(X[i]-w_base/2+0.5)*le,(Y[i]-w_base/2+0.5)*le,(Z[i]-w_height+1)*le,WALL,1,0,0,0,0,0,0,0,0,0,0,OFF);
 		 number+=number2;
-		 cout<<"壁完成\n";
+		 cout<<"壁完成\n";*/
 	 }
 
 	 ///////////////////////////////////////

@@ -326,10 +326,10 @@ mpsconfig::mpsconfig()
 //í¥íeê´åvéZ 
 	flag_ELAST=OFF;
 	flag_HYPER=ON;
-	flag_GRAVITY=ON;
+	flag_GRAVITY=OFF;
 	hyper_density=1000;          //water:997.04  ÉGÉ^ÉmÅ[Éã:798[kg/m3]
-	c10=30000;//30000;
-	c01=20000;//20000;
+	c10=30000000;//30000;
+	c01=20000000;//20000;
 	flag_wall=OFF;
 	h_dis=1.9*distancebp;
 	h_vis=1;
