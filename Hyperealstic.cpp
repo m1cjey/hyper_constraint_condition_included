@@ -73,6 +73,9 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 	calc_half_p(CON,PART,HYPER,HYPER1,0,F);
 
+//	for(int i=0;i<h_num;i++)	if(PART[i].r[A_Z]<=0)	PART[i].r[A_Z]*=-1;
+	if(t==2)	for(int i=0;i<16;i++)	PART[i+16].r[A_Z]+=0.5*CON.get_distancebp();
+
 //	for(int i=0;i<p_num;i++)	cout<<"r["<<i<<"]={"<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<"}"<<endl;
 
 	calc_F(CON,PART,HYPER,HYPER1);
@@ -1001,8 +1004,7 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 			{
 				PART[i].r[A_X]+=Dt*HYPER[i].half_p[A_X]/mi;
 				PART[i].r[A_Y]+=Dt*HYPER[i].half_p[A_Y]/mi;
-				PART[i].r[A_Z]+=Dt*HYPER[i].half_p[A_Z]/mi;		
-				if(PART[i].r[A_Z]<=0)	PART[i].r[A_Z]*=-1;
+				PART[i].r[A_Z]+=Dt*HYPER[i].half_p[A_Z]/mi;
 			}
 /*			else
 			{
@@ -2196,12 +2198,30 @@ void output_hyper_data(vector<mpselastic> PART,vector<hyperelastic> HYPER,vector
 		wiin.close();
 	}*/
 
-/*	stringstream ss_dgdq;
+	stringstream ss_dgdq;
 	ss_dgdq<<"./DgDq/DgDq"<<t<<".csv";
 	ofstream dg(ss_dgdq.str());
-	ofstream d_p("d_P.csv", ios::app);
+/*	ofstream d_p("d_P.csv", ios::app);
 	ofstream h_p("h_P.csv", ios::app);*/
-/*	ofstream stress("stress.csv", ios::app);*/
+	stringstream ss_stress;
+	ss_stress<<"./Stress/stress"<<t<<".csv";
+	ofstream fs(ss_stress.str());
+	for(int i=0;i<h_num;i++)
+	{
+		int N=HYPER[i].N;
+		dg<<i;
+		for(int j=0;j<N;j++)
+		{
+			int nei=HYPER[i].NEI[j];
+			dg<<","<<nei<<","<<HYPER1[i*h_num+nei].DgDq[A_X]<<","<<HYPER1[i*h_num+nei].DgDq[A_Y]<<","<<HYPER1[i*h_num+nei].DgDq[A_Z]<<endl;
+		}
+		fs<<i<<","<<HYPER[i].stress[A_X][A_X]<<","<<HYPER[i].stress[A_X][A_Y]<<","<<HYPER[i].stress[A_X][A_Z]<<endl;
+		fs<<","<<HYPER[i].stress[A_Y][A_X]<<","<<HYPER[i].stress[A_Y][A_Y]<<","<<HYPER[i].stress[A_Y][A_Z]<<endl;
+		fs<<","<<HYPER[i].stress[A_Z][A_X]<<","<<HYPER[i].stress[A_Z][A_Y]<<","<<HYPER[i].stress[A_Z][A_Z]<<endl;
+	}
+	dg.close();
+	fs.close();
+
 /*	ofstream J("J.csv", ios::app);
 	ofstream ti_Fi("ti_Fi.csv", ios::app);
 	ofstream Fi("Fi.csv", ios::app);*/
