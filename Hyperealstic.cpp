@@ -73,8 +73,13 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 	calc_half_p(CON,PART,HYPER,HYPER1,0,F);
 
-//	for(int i=0;i<h_num;i++)	if(PART[i].r[A_Z]<=0)	PART[i].r[A_Z]*=-1;
-	if(t==2)	for(int i=0;i<16;i++)	PART[i+16].r[A_Z]+=0.5*CON.get_distancebp();
+	for(int i=0;i<h_num;i++)
+	{
+		if(PART[i].r[A_Z]<0 && HYPER[i].flag_wall==ON)
+		{
+			PART[i].r[A_Z]=0;
+		}
+	}	
 
 //	for(int i=0;i<p_num;i++)	cout<<"r["<<i<<"]={"<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<"}"<<endl;
 
@@ -115,7 +120,7 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 
 	//底面のZ座標と粒子数の探索
 	////初期運動量
-	for(int i=0;i<h_num;i++)	HYPER[i].p[A_Z]=-1.0*mi;
+	for(int i=0;i<h_num;i++)	HYPER[i].p[A_Z]=-10*mi;
 	
 	//曲げねじり
 /*	if(model==21)
@@ -688,6 +693,17 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 			n_rx[i]+=Dt*(HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X])/mi;
 			n_ry[i]+=Dt*(HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y])/mi;
 			n_rz[i]+=Dt*(HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z])/mi;
+
+			if(n_rz[i]<0 && HYPER[i].flag_wall==OFF)
+			{
+				n_rz[i]=0;
+				HYPER[i].flag_wall==ON;
+			}
+			else
+			{
+				HYPER[i].flag_wall==OFF;
+			}
+				
 	//		if(n_rz[i]<=0)	n_rz[i]*=-1;
 		}
 /*		else
@@ -697,6 +713,8 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 			cout<<"壁侵入粒子"<<i<<"lambda="<<lambda[i]<<endl;	//way1
 		}*/
 	}
+
+	for(int i=0;i<16;i++)	
 
 
 	////DgDqとfxの更新
@@ -3215,6 +3233,7 @@ hyperelastic::hyperelastic()
 		NEI[i]=0;
 	}
 	N=0;
+	flag_wall=0;
 	lambda=1;
 	J=0;
 	pnd=0;

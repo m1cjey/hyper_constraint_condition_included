@@ -8,6 +8,7 @@ public:
 	unsigned ID;
 	int NEI[500];
 	int N;
+	int flag_wall;
 
 	double lambda;
 	double half_p[DIMENSION];
