@@ -73,17 +73,21 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	newton_raphson(CON,PART,HYPER,HYPER1,t,F);
 
 	double *old_r_z=new double [h_num];
-	for(int i=0;i<h_num;i++)	old_r_z[i]=PART[i].r[A_Z];
+	for(int i=0;i<h_num;i++)
+	{
+		old_r_z[i]=PART[i].r[A_Z];
+		HYPER[i].flag_wall=OFF;
+	}
 
 
 	calc_half_p(CON,PART,HYPER,HYPER1,0,F);
 
 	stringstream ss;
-	ss<<"./position_before_r_changed"<<t<<".csv";
+	ss<<"./Position/position_before_r_changed"<<t<<".csv";
 	ofstream fs(ss.str());
 
 	stringstream ss2;
-	ss2<<"./half_p_before_r_changed"<<t<<".csv";
+	ss2<<"./Half_P/half_p_before_r_changed"<<t<<".csv";
 	ofstream fs2(ss2.str());
 
 	double *old_hpz=new double [h_num];
@@ -146,9 +150,15 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 			double E=0.5/mi*(HYPER[i].p[A_X]*HYPER[i].p[A_X]+HYPER[i].p[A_Y]*HYPER[i].p[A_Y]+HYPER[i].p[A_Z]*HYPER[i].p[A_Z])+(0.5/mi*old_hpz[i]*old_hpz[i]-0.5/mi*HYPER[i].half_p[A_Z]*HYPER[i].half_p[A_Z]);
 			HYPER[i].p[A_X]=p_vector[A_X]*sqrt(2*E);
 			HYPER[i].p[A_Y]=p_vector[A_Y]*sqrt(2*E);
-			HYPER[i].p[A_Z]=p_vector[A_Z]*sqrt(2*E);
+			HYPER[i].p[A_Z]=-1*p_vector[A_Z]*sqrt(2*E);//*/
+
+	/*		double p_norm=sqrt(HYPER[i].p[A_X]*HYPER[i].p[A_X]+HYPER[i].p[A_Y]*HYPER[i].p[A_Y]);
+			double p_vector[DIMENSION]={HYPER[i].p[A_X]/p_norm,HYPER[i].p[A_Y]/p_norm};
+			double E=0.5/mi*(HYPER[i].p[A_X]*HYPER[i].p[A_X]+HYPER[i].p[A_Y]*HYPER[i].p[A_Y]+HYPER[i].p[A_Z]*HYPER[i].p[A_Z])+(0.5/mi*old_hpz[i]*old_hpz[i]-0.5/mi*HYPER[i].half_p[A_Z]*HYPER[i].half_p[A_Z]);
+			HYPER[i].p[A_X]=p_vector[A_X]*sqrt(2*E);
+			HYPER[i].p[A_Y]=p_vector[A_Y]*sqrt(2*E);
+			HYPER[i].p[A_Z]=0;//*/
 		}
-		HYPER[i].flag_wall=OFF;
 	}//*/
 
 /*	for(int i=0;i<h_num;i++)
@@ -184,7 +194,7 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 
 	//底面のZ座標と粒子数の探索
 	////初期運動量
-	for(int i=0;i<h_num;i++)	HYPER[i].p[A_Z]=-10*mi;
+	for(int i=0;i<h_num;i++)	HYPER[i].p[A_Z]=-1.0*mi;
 	
 	//曲げねじり
 /*	if(model==21)
@@ -1409,23 +1419,46 @@ void renew_lambda(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic> &HY
 	
 	for(int k=0;k<h_num;k++)
 	{
-		int Nk=HYPER[k].N;
-		double N_right=0;
-		for(int i=0;i<Nk;i++)
+	//	if(HYPER[k].flag_wall==OFF)
 		{
-			int in=HYPER[k].NEI[i];
-			for(int j=0;j<Nk;j++)
+			int Nk=HYPER[k].N;
+			double N_right=0;
+			for(int i=0;i<Nk;i++)
 			{
-				int jn=HYPER[k].NEI[j];
-				N_Left[in*h_num+jn]+=Dt*0.5*(HYPER1[in*h_num+k].DgDq[0]*HYPER1[jn*h_num+k].DgDq[0]+HYPER1[in*h_num+k].DgDq[1]*HYPER1[jn*h_num+k].DgDq[1]+HYPER1[in*h_num+k].DgDq[2]*HYPER1[jn*h_num+k].DgDq[2]);
-			}
-			N_Left[in*h_num+k]+=Dt*0.5*(HYPER1[in*h_num+k].DgDq[0]*HYPER1[k*h_num+k].DgDq[0]+HYPER1[in*h_num+k].DgDq[1]*HYPER1[k*h_num+k].DgDq[1]+HYPER1[in*h_num+k].DgDq[2]*HYPER1[k*h_num+k].DgDq[2]);
-			N_Left[k*h_num+in]+=Dt*0.5*(HYPER1[k*h_num+k].DgDq[0]*HYPER1[in*h_num+k].DgDq[0]+HYPER1[k*h_num+k].DgDq[1]*HYPER1[in*h_num+k].DgDq[1]+HYPER1[k*h_num+k].DgDq[2]*HYPER1[in*h_num+k].DgDq[2]);
-			N_right+=HYPER[in].differential_p[0]*HYPER1[k*h_num+in].DgDq[0]+HYPER[in].differential_p[1]*HYPER1[k*h_num+in].DgDq[1]+HYPER[in].differential_p[2]*HYPER1[k*h_num+in].DgDq[2];
-		}//jに関するfor文の終わり
-		N_Right[k]=N_right+HYPER[k].differential_p[0]*HYPER1[k*h_num+k].DgDq[0]+HYPER[k].differential_p[1]*HYPER1[k*h_num+k].DgDq[1]+HYPER[k].differential_p[2]*HYPER1[k*h_num+k].DgDq[2];//1/mk*N_right;	
-		N_Left[k*h_num+k]+=Dt*0.5*(HYPER1[k*h_num+k].DgDq[0]*HYPER1[k*h_num+k].DgDq[0]+HYPER1[k*h_num+k].DgDq[1]*HYPER1[k*h_num+k].DgDq[1]+HYPER1[k*h_num+k].DgDq[2]*HYPER1[k*h_num+k].DgDq[2]);
-	}//iに関するfor文の終わり*/
+				int in=HYPER[k].NEI[i];
+				for(int j=0;j<Nk;j++)
+				{
+					int jn=HYPER[k].NEI[j];
+					N_Left[in*h_num+jn]+=Dt*0.5*(HYPER1[in*h_num+k].DgDq[0]*HYPER1[jn*h_num+k].DgDq[0]+HYPER1[in*h_num+k].DgDq[1]*HYPER1[jn*h_num+k].DgDq[1]+HYPER1[in*h_num+k].DgDq[2]*HYPER1[jn*h_num+k].DgDq[2]);
+				}
+				N_Left[in*h_num+k]+=Dt*0.5*(HYPER1[in*h_num+k].DgDq[0]*HYPER1[k*h_num+k].DgDq[0]+HYPER1[in*h_num+k].DgDq[1]*HYPER1[k*h_num+k].DgDq[1]+HYPER1[in*h_num+k].DgDq[2]*HYPER1[k*h_num+k].DgDq[2]);
+				N_Left[k*h_num+in]+=Dt*0.5*(HYPER1[k*h_num+k].DgDq[0]*HYPER1[in*h_num+k].DgDq[0]+HYPER1[k*h_num+k].DgDq[1]*HYPER1[in*h_num+k].DgDq[1]+HYPER1[k*h_num+k].DgDq[2]*HYPER1[in*h_num+k].DgDq[2]);
+				N_right+=HYPER[in].differential_p[0]*HYPER1[k*h_num+in].DgDq[0]+HYPER[in].differential_p[1]*HYPER1[k*h_num+in].DgDq[1]+HYPER[in].differential_p[2]*HYPER1[k*h_num+in].DgDq[2];
+			}//jに関するfor文の終わり
+			N_Right[k]=N_right+HYPER[k].differential_p[0]*HYPER1[k*h_num+k].DgDq[0]+HYPER[k].differential_p[1]*HYPER1[k*h_num+k].DgDq[1]+HYPER[k].differential_p[2]*HYPER1[k*h_num+k].DgDq[2];//1/mk*N_right;	
+			N_Left[k*h_num+k]+=Dt*0.5*(HYPER1[k*h_num+k].DgDq[0]*HYPER1[k*h_num+k].DgDq[0]+HYPER1[k*h_num+k].DgDq[1]*HYPER1[k*h_num+k].DgDq[1]+HYPER1[k*h_num+k].DgDq[2]*HYPER1[k*h_num+k].DgDq[2]);
+		}
+/*		if(HYPER[k].flag_wall==ON)
+		{
+			int Nk=HYPER[k].N;
+			double N_right=0;
+			for(int i=0;i<Nk;i++)
+			{
+				int in=HYPER[k].NEI[i];
+				for(int j=0;j<Nk;j++)
+				{
+					int jn=HYPER[k].NEI[j];
+					N_Left[in*h_num+jn]+=Dt*0.5*(HYPER1[in*h_num+k].DgDq[0]*HYPER1[jn*h_num+k].DgDq[0]+HYPER1[in*h_num+k].DgDq[1]*HYPER1[jn*h_num+k].DgDq[1]-HYPER1[in*h_num+k].DgDq[2]*HYPER1[jn*h_num+k].DgDq[2]);
+				}
+				N_Left[in*h_num+k]+=Dt*0.5*(HYPER1[in*h_num+k].DgDq[0]*HYPER1[k*h_num+k].DgDq[0]+HYPER1[in*h_num+k].DgDq[1]*HYPER1[k*h_num+k].DgDq[1]-HYPER1[in*h_num+k].DgDq[2]*HYPER1[k*h_num+k].DgDq[2]);
+				N_Left[k*h_num+in]+=Dt*0.5*(HYPER1[k*h_num+k].DgDq[0]*HYPER1[in*h_num+k].DgDq[0]+HYPER1[k*h_num+k].DgDq[1]*HYPER1[in*h_num+k].DgDq[1]-HYPER1[k*h_num+k].DgDq[2]*HYPER1[in*h_num+k].DgDq[2]);
+				N_right+=HYPER[in].differential_p[0]*HYPER1[k*h_num+in].DgDq[0]+HYPER[in].differential_p[1]*HYPER1[k*h_num+in].DgDq[1]-HYPER[in].differential_p[2]*HYPER1[k*h_num+in].DgDq[2];
+			}//jに関するfor文の終わり
+			N_Right[k]=N_right+HYPER[k].differential_p[0]*HYPER1[k*h_num+k].DgDq[0]+HYPER[k].differential_p[1]*HYPER1[k*h_num+k].DgDq[1]-HYPER[k].differential_p[2]*HYPER1[k*h_num+k].DgDq[2];//1/mk*N_right;	
+			N_Left[k*h_num+k]+=Dt*0.5*(HYPER1[k*h_num+k].DgDq[0]*HYPER1[k*h_num+k].DgDq[0]+HYPER1[k*h_num+k].DgDq[1]*HYPER1[k*h_num+k].DgDq[1]-HYPER1[k*h_num+k].DgDq[2]*HYPER1[k*h_num+k].DgDq[2]);
+		}//*/
+	}//iに関するfor文の終わり
+
 
 /*
 	for(int i=0;i<h_num;i++)	cout<<"N_Right["<<i<<"]="<<N_Right[i]<<endl;
