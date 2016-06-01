@@ -79,6 +79,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		HYPER[i].flag_wall=OFF;
 	}
 
+	p_convergence_test();
 
 	calc_half_p(CON,PART,HYPER,HYPER1,0,F);
 
