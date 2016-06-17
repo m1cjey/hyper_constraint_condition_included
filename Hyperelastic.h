@@ -8,6 +8,7 @@ public:
 	unsigned ID;
 	int NEI[500];
 	int N;
+	double pnd0;
 	int flag_wall;
 
 	double lambda;

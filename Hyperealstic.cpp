@@ -35,21 +35,19 @@ void GaussSeidelvh(double *A, int pn, double *b,double ep);
 void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t,double **F)
 {	
 
-
 	ofstream time("time_log.dat",ios::app);
 	clock_t	start_t=clock();
 	time<<start_t*CLOCKS_PER_SEC<<"	";
 
 	int h_num=HYPER.size();
-	int p_num=PART.size();
-	cout<<"h_num="<<h_num<<endl;
-	cout<<"p_num="<<p_num<<endl;
 	double Dt=CON.get_dt();
 	double mi=CON.get_hyper_density()*get_volume(&CON);
+
+	int switch_w=OFF;
+
+	cout<<"h_num="<<h_num<<endl;
 	cout<<"Hypercalculation starts."<<endl;
-	//calc_gravity(CON,HYPER,h_num);
-	
-//	contact_judge(CON,PART,HYPER,max_h,t);
+
 
 	if(t==1)
 	{
@@ -60,7 +58,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	}
 	
 	
-	if(CON.get_flag_vis()==ON)	calc_vis_f(CON,PART,HYPER,HYPER1,0,t);
+	if(CON.get_flag_vis()==ON)	calc_vis_f(CON,PART,HYPER,t);
 
 	if(t==1 || t%CON.get_interval()==0)
 	{
@@ -68,6 +66,8 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		momentum_movie_AVS(CON,t,PART,HYPER,F);
 		output_energy(CON,PART,HYPER,t);
 	}
+
+
 
 
 	newton_raphson(CON,PART,HYPER,HYPER1,t,F);
@@ -78,8 +78,6 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		old_r_z[i]=PART[i].r[A_Z];
 		HYPER[i].flag_wall=OFF;
 	}
-
-	p_convergence_test();
 
 	calc_half_p(CON,PART,HYPER,HYPER1,0,F);
 
@@ -325,6 +323,7 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 			HYPER1[i*h_num+j].wiin=wiin;
 		}
 		HYPER[i].N=N;
+		HYPER[i].N0=N;
 	}
 	
 
@@ -3345,6 +3344,7 @@ hyperelastic::hyperelastic()
 		NEI[i]=0;
 	}
 	N=0;
+	pnd0=0;
 	flag_wall=0;
 	lambda=1;
 	J=0;

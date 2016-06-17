@@ -210,7 +210,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 
 //”S«€ŒvZ
-void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>HYPER1,int rigid_number,int t);
+void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,int t);
 void calc_spl_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic2>&HYPER1,int hyper_number);
 
 //‰—Ío—ÍŠÖ”
