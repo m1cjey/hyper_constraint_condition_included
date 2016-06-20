@@ -42,9 +42,9 @@ void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER
 		}
 		double lambda=p_lambda/pnd;
 
-		HYPER[i].vis_force[A_X]=2*d/lambda/pnd0*p_vis[A_X];
-		HYPER[i].vis_force[A_Y]=2*d/lambda/pnd0*p_vis[A_Y];
-		HYPER[i].vis_force[A_Z]=2*d/lambda/pnd0*p_vis[A_Z];
+		HYPER[i].vis_force[A_X]=2*v*d/lambda/pnd0*p_vis[A_X];
+		HYPER[i].vis_force[A_Y]=2*v*d/lambda/pnd0*p_vis[A_Y];
+		HYPER[i].vis_force[A_Z]=2*v*d/lambda/pnd0*p_vis[A_Z];
 
 		fv<<","<<HYPER[i].vis_force[A_X]<<","<<HYPER[i].vis_force[A_Y]<<","<<HYPER[i].vis_force[A_Z]<<endl;
 	}
