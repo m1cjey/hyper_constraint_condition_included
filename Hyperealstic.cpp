@@ -43,7 +43,6 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	double Dt=CON.get_dt();
 	double mi=CON.get_hyper_density()*get_volume(&CON);
 
-	int switch_w=OFF;
 
 	cout<<"h_num="<<h_num<<endl;
 	cout<<"Hypercalculation starts."<<endl;
@@ -58,8 +57,6 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	}
 	
 	
-	if(CON.get_flag_vis()==ON)	calc_vis_f(CON,PART,HYPER,t);
-
 	if(t==1 || t%CON.get_interval()==0)
 	{
 		output_hyper_data(PART,HYPER,HYPER1,t);
@@ -67,11 +64,26 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		output_energy(CON,PART,HYPER,t);
 	}
 
-
-
+	if(CON.get_flag_vis()==ON)	calc_vis_f(CON,PART,HYPER,t);
 
 	newton_raphson(CON,PART,HYPER,HYPER1,t,F);
 
+
+	calc_half_p(CON,PART,HYPER,HYPER1,0,F);
+
+	calc_F(CON,PART,HYPER,HYPER1);
+
+	calc_stress(CON,HYPER);
+	
+	calc_differential_p(CON,PART,HYPER,HYPER1,F);
+
+	renew_lambda(CON,PART,HYPER,HYPER1,t);
+
+//	for(int i=0;i<p_num;i++)	cout<<"renew_lambda"<<i<<"="<<HYPER[i].lambda<<endl;
+
+	calc_half_p(CON,PART,HYPER,HYPER1,1,F);
+
+	/*
 	double *old_r_z=new double [h_num];
 	for(int i=0;i<h_num;i++)
 	{
@@ -118,27 +130,13 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	calc_stress(CON,HYPER);
 	
 	calc_differential_p(CON,PART,HYPER,HYPER1,F);
-/*	for(int i=0;i<h_num;i++)
-	{
-		if(HYPER[i].flag_wall==ON)
-		{
-			HYPER[i].differential_p[A_Z]=0;
-			HYPER[i].flag_wall=OFF;
-		}
-	}//*/
 
-//	for(int i=0;i<p_num;i++)	cout<<"d_p_x"<<i<<"="<<HYPER[i].differential_p[A_X]<<endl;
+	//	for(int i=0;i<p_num;i++)	cout<<"d_p_x"<<i<<"="<<HYPER[i].differential_p[A_X]<<endl;
 
 	renew_lambda(CON,PART,HYPER,HYPER1,t);
 
 //	for(int i=0;i<p_num;i++)	cout<<"renew_lambda"<<i<<"="<<HYPER[i].lambda<<endl;
 
-	calc_half_p(CON,PART,HYPER,HYPER1,1,F);
-/*	for(int i=0;i<h_num;i++)
-	{
-		if(HYPER[i].flag_wall==ON)	HYPER[i].p[A_Z]=0;
-		HYPER[i].flag_wall=OFF;
-	}*/
 
 	for(int i=0;i<h_num;i++)
 	{
@@ -149,26 +147,10 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 			double E=0.5/mi*(HYPER[i].p[A_X]*HYPER[i].p[A_X]+HYPER[i].p[A_Y]*HYPER[i].p[A_Y]+HYPER[i].p[A_Z]*HYPER[i].p[A_Z])+(0.5/mi*old_hpz[i]*old_hpz[i]-0.5/mi*HYPER[i].half_p[A_Z]*HYPER[i].half_p[A_Z]);
 			HYPER[i].p[A_X]=p_vector[A_X]*sqrt(2*E);
 			HYPER[i].p[A_Y]=p_vector[A_Y]*sqrt(2*E);
-			HYPER[i].p[A_Z]=p_vector[A_Z]*sqrt(2*E);//*/
-
-	/*		double p_norm=sqrt(HYPER[i].p[A_X]*HYPER[i].p[A_X]+HYPER[i].p[A_Y]*HYPER[i].p[A_Y]);
-			double p_vector[DIMENSION]={HYPER[i].p[A_X]/p_norm,HYPER[i].p[A_Y]/p_norm};
-			double E=0.5/mi*(HYPER[i].p[A_X]*HYPER[i].p[A_X]+HYPER[i].p[A_Y]*HYPER[i].p[A_Y]+HYPER[i].p[A_Z]*HYPER[i].p[A_Z])+(0.5/mi*old_hpz[i]*old_hpz[i]-0.5/mi*HYPER[i].half_p[A_Z]*HYPER[i].half_p[A_Z]);
-			HYPER[i].p[A_X]=p_vector[A_X]*sqrt(2*E);
-			HYPER[i].p[A_Y]=p_vector[A_Y]*sqrt(2*E);
-			HYPER[i].p[A_Z]=0;//*/
+			HYPER[i].p[A_Z]=p_vector[A_Z]*sqrt(2*E);//
 		}
-	}//*/
-
-/*	for(int i=0;i<h_num;i++)
-	{
-		if(HYPER[i].flag_wall==ON)
-		{
-			HYPER[i].p[A_Z]-=(HYPER[i].half_p[A_Z]-old_hpz[i]);
-		}
-		HYPER[i].flag_wall=OFF;
-	}//*/
-	delete[]	old_hpz;
+	}//
+	delete[]	old_hpz;*/
 
 	//	for(int i=0;i<p_num;i++)	cout<<"renew_p_x"<<i<<"="<<HYPER[i].p[A_X]<<endl;
 	cout<<"Hypercalculation ends."<<endl;
