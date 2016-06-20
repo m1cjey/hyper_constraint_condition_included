@@ -19,7 +19,7 @@ mpsconfig::mpsconfig()
 	ss>>step;
 	fin.close();*/
 	
-	step=10000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
+	step=1000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
 	switch_FEM=false;		//FEMを実行するかしないか false
 	nonlinear_elastic=false;	//弾性体非線形計算するかtrue
 	switch_vis=OFF;			//粘性項計算するかしないか・・・これはあとで消す
@@ -330,7 +330,6 @@ mpsconfig::mpsconfig()
 	hyper_density=1000;          //water:997.04  エタノール:798[kg/m3]
 	c10=30000;//30000;
 	c01=20000;//20000;
-	flag_wall=OFF;
 	h_dis=1.9*distancebp;
 	h_vis=1;
 	flag_vis=OFF;
