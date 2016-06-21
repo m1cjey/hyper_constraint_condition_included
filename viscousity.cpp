@@ -14,6 +14,9 @@ void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER
 	ss<<"./Viscosity/vis"<<t<<".csv";
 	ofstream fv(ss.str());
 
+	ofstream fv_sum("Vis.csv",ios::app);
+	fv_sum<<t<<",";
+	double v_sum=0;
 	for(int i=0;i<h_num;i++)
 	{
 		double pnd0=HYPER[i].pnd0;
@@ -46,9 +49,12 @@ void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER
 		HYPER[i].vis_force[A_Y]=2*v*d/lambda/pnd0*p_vis[A_Y];
 		HYPER[i].vis_force[A_Z]=2*v*d/lambda/pnd0*p_vis[A_Z];
 
-		fv<<","<<HYPER[i].vis_force[A_X]<<","<<HYPER[i].vis_force[A_Y]<<","<<HYPER[i].vis_force[A_Z]<<endl;
+		fv<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<","<<HYPER[i].vis_force[A_X]<<","<<HYPER[i].vis_force[A_Y]<<","<<HYPER[i].vis_force[A_Z]<<endl;
+		fv_sum<<sqrt(HYPER[i].vis_force[A_X]*HYPER[i].vis_force[A_X]+HYPER[i].vis_force[A_Y]*HYPER[i].vis_force[A_Y]+HYPER[i].vis_force[A_Z]*HYPER[i].vis_force[A_Z])<<",";
+		v_sum+=sqrt(HYPER[i].vis_force[A_X]*HYPER[i].vis_force[A_X]+HYPER[i].vis_force[A_Y]*HYPER[i].vis_force[A_Y]+HYPER[i].vis_force[A_Z]*HYPER[i].vis_force[A_Z]);
 	}
-
+	fv_sum<<v_sum<<endl;
+	fv_sum.close();
 	fv.close();
 
 	cout<<"---------OK"<<endl;

@@ -1,6 +1,7 @@
 #include "stdafx.h"	
 
 void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F,int t);
+void calc_half_p_w(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F,int t);
 void calc_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F);
 void iterative_calculation(mpsconfig &CON, vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F,int t);
 void renew_lambda(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,int t);
@@ -70,9 +71,13 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 	newton_raphson(CON,PART,HYPER,HYPER1,t,F);
 
-	calc_half_p(CON,PART,HYPER,HYPER1,F,t);
-
+	if(CON.get_flag_wall()==ON)	calc_half_p_w(CON,PART,HYPER,HYPER1,F,t);
+	else
+	{
+		calc_half_p(CON,PART,HYPER,HYPER1,F,t);
+	}
 	//	for(int i=0;i<p_num;i++)	cout<<"renew_p_x"<<i<<"="<<HYPER[i].p[A_X]<<endl;
+	
 	cout<<"Hypercalculation ends."<<endl;
 
 	clock_t end_t=clock();
@@ -123,9 +128,6 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 			HYPER[i].p[A_Z]=0;
 		}
 	}//*/
-
-
-
 
 	//ã»Ç∞
 	/*if(model==21)
@@ -914,7 +916,7 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 }
 
 
-void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F,int t)
+void calc_half_p_w(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F,int t)
 {
 //	if(repetation==0)	cout<<"âºÇÃâ^ìÆó Åïà íuç¿ïWåvéZ";
 //	else	cout<<"â^ìÆó åvéZ";
@@ -1055,6 +1057,76 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 	}
 
 }
+void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F,int t)
+{
+	//calc_half_påvéZ
+//	if(repetation==0)	cout<<"âºÇÃâ^ìÆó Åïà íuç¿ïWåvéZ";
+//	else	cout<<"â^ìÆó åvéZ";
+	int h_num=HYPER.size();
+	double Dt=CON.get_dt();
+	double le=CON.get_distancebp();
+	double V=get_volume(&CON);
+	double mi=V*CON.get_hyper_density();
+	double G=980;
+	int flag_vis=CON.get_flag_vis();
+	bool flag_FEM=CON.get_FEM_flag();
+	int flag_G=CON.get_flag_G();
+	double density=CON.get_hyper_density();
+	int model_num=CON.get_model_number();
+
+	for(int i=0;i<h_num;i++)
+	{
+		double p_half_p[DIMENSION]={0,0,0};
+		int Ni=HYPER[i].N;
+		for(int j=0;j<Ni;j++)
+		{		
+			int k=HYPER[i].NEI[j];
+			p_half_p[A_X]+=(HYPER[k].stress[0][0]-HYPER[k].lambda)*HYPER1[k*h_num+i].DgDq[0]+HYPER[k].stress[0][1]*HYPER1[k*h_num+i].DgDq[1]+HYPER[k].stress[0][2]*HYPER1[k*h_num+i].DgDq[2];
+			p_half_p[A_Y]+=HYPER[k].stress[1][0]*HYPER1[k*h_num+i].DgDq[0]+(HYPER[k].stress[1][1]-HYPER[k].lambda)*HYPER1[k*h_num+i].DgDq[1]+HYPER[k].stress[1][2]*HYPER1[k*h_num+i].DgDq[2];
+			p_half_p[A_Z]+=HYPER[k].stress[2][0]*HYPER1[k*h_num+i].DgDq[0]+HYPER[k].stress[2][1]*HYPER1[k*h_num+i].DgDq[1]+(HYPER[k].stress[2][2]-HYPER[k].lambda)*HYPER1[k*h_num+i].DgDq[2];
+		}//jÇ…ä÷Ç∑ÇÈforï∂ÇÃèIÇÌÇË	
+		p_half_p[A_X]+=(HYPER[i].stress[0][0]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq[0]+HYPER[i].stress[0][1]*HYPER1[i*h_num+i].DgDq[1]+HYPER[i].stress[0][2]*HYPER1[i*h_num+i].DgDq[2];
+		p_half_p[A_Y]+=HYPER[i].stress[1][0]*HYPER1[i*h_num+i].DgDq[0]+(HYPER[i].stress[1][1]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq[1]+HYPER[i].stress[1][2]*HYPER1[i*h_num+i].DgDq[2];
+		p_half_p[A_Z]+=HYPER[i].stress[2][0]*HYPER1[i*h_num+i].DgDq[0]+HYPER[i].stress[2][1]*HYPER1[i*h_num+i].DgDq[1]+(HYPER[i].stress[2][2]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq[2];
+
+		//èdóÕçÄ
+		if(flag_G==ON)	p_half_p[A_Z]-=G*mi;
+		//îSê´çÄ
+		if(flag_vis==ON)
+		{
+			p_half_p[A_X]+=HYPER[i].vis_force[A_X];
+			p_half_p[A_Y]+=HYPER[i].vis_force[A_Y];
+			p_half_p[A_Z]+=HYPER[i].vis_force[A_Z];
+		}
+		//é•óÕçÄ
+		if(flag_FEM==ON&&PART[i].toFEM==ON)
+		{
+			p_half_p[A_X]+=V*F[A_X][i];//density;
+			p_half_p[A_Y]+=V*F[A_Y][i];//density;
+			p_half_p[A_Z]+=V*F[A_Z][i];//density;
+		}
+		//half_pÇÃçXêV
+		HYPER[i].half_p[A_X]=HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X];
+		HYPER[i].half_p[A_Y]=HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y];
+		HYPER[i].half_p[A_Z]=HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z];//
+		//à íuç¿ïWÇÃçXêV
+		PART[i].r[A_X]+=Dt*HYPER[i].half_p[A_X]/mi;
+		PART[i].r[A_Y]+=Dt*HYPER[i].half_p[A_Y]/mi;
+		PART[i].r[A_Z]+=Dt*HYPER[i].half_p[A_Z]/mi;
+	}//iÇ…ä÷Ç∑ÇÈforï∂ÇÃèIÇÌÇË
+//	cout<<"----------OK"<<endl;
+
+	calc_F(CON,PART,HYPER,HYPER1);
+
+	calc_stress(CON,HYPER);
+
+	calc_differential_p(CON,PART,HYPER,HYPER1,F);
+
+	renew_lambda(CON,PART,HYPER,HYPER1,t);
+
+	calc_p(CON,PART,HYPER,HYPER1,F);
+
+}
 
 void calc_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F)
 {
@@ -1093,9 +1165,9 @@ void calc_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,
 		//îSê´çÄ
 		if(flag_vis==ON)
 		{
-			p_half_p[A_X]-=HYPER[i].vis_force[A_X];
-			p_half_p[A_Y]-=HYPER[i].vis_force[A_Y];
-			p_half_p[A_Z]-=HYPER[i].vis_force[A_Z];
+			p_half_p[A_X]+=HYPER[i].vis_force[A_X];
+			p_half_p[A_Y]+=HYPER[i].vis_force[A_Y];
+			p_half_p[A_Z]+=HYPER[i].vis_force[A_Z];
 		}
 		//é•óÕçÄ
 		if(flag_FEM==ON	||	PART[i].toFEM==ON)
@@ -1143,10 +1215,35 @@ void iterative_calculation(mpsconfig &CON, vector<mpselastic> &PART,vector<hyper
 	int flag_G=CON.get_flag_G();
 	double density=CON.get_hyper_density();
 
+	stringstream ss_E;
+	ss_E<<"./Wall/E"<<t<<".csv";
+	
+	stringstream ss_lam;
+	ss_lam<<"./Wall/lambda"<<t<<".csv";
+		
+	if(count==1)
+	{
+		ofstream init0(ss_E.str(), ios::trunc);
+		ofstream init1(ss_lam.str(), ios::trunc);
+	
+		init0.close();
+		init1.close();
+	}
+
+	ofstream e(ss_E.str(), ios::app);
+	ofstream lam(ss_lam.str(), ios::app);
+
 	while(dX>ep)
 	{
 		count++;
 
+		if(count==1)
+		{
+			e<<"îΩïúâÒêî"<<","<<"E"<<endl;
+			lam<<"îΩïúâÒêî"<<","<<"lambda"<<endl;
+			for(int i=0;i<h_num;i++)	lam<<","<<i;
+			lam<<endl;
+		}	
 		if(count!=1)
 		{
 			//calc_p
@@ -1212,11 +1309,22 @@ void iterative_calculation(mpsconfig &CON, vector<mpselastic> &PART,vector<hyper
 	//	for(int i=0;i<p_num;i++)	cout<<"renew_lambda"<<i<<"="<<HYPER[i].lambda<<endl;
 
 		dX=0;
-		for(int i=0;i<h_num;i++)	dX+=fabs(X_old[i]-HYPER[i].lambda);
+		lam<<count;
+		for(int i=0;i<h_num;i++)
+		{
+			dX+=fabs(X_old[i]-HYPER[i].lambda);
+			lam<<","<<HYPER[i].lambda;
+		}
 		if(count%1000==0)	cout<<"count="<<count<<" ,dX="<<dX<<endl;
 		if(count>10000)	break;
+		e<<count<<","<<dX<<endl;
+		lam<<endl;
+
 	}
 	delete[]	X_old;
+
+	e.close();
+	lam.close();
 
 	calc_p(CON,PART,HYPER,HYPER1,F);
 }
@@ -1448,9 +1556,9 @@ void calc_differential_p(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelast
 		if(flag_G==ON)	HYPER[i].differential_p[A_Z]-=Dt*0.5*G*mi;
 		if(flag_vis==ON)
 		{
-			HYPER[i].differential_p[A_X]-=Dt*0.5*HYPER[i].vis_force[A_X];
-			HYPER[i].differential_p[A_Y]-=Dt*0.5*HYPER[i].vis_force[A_Y];
-			HYPER[i].differential_p[A_Z]-=Dt*0.5*HYPER[i].vis_force[A_Z];
+			HYPER[i].differential_p[A_X]+=Dt*0.5*HYPER[i].vis_force[A_X];
+			HYPER[i].differential_p[A_Y]+=Dt*0.5*HYPER[i].vis_force[A_Y];
+			HYPER[i].differential_p[A_Z]+=Dt*0.5*HYPER[i].vis_force[A_Z];
 		}
 		if(flag_FEM==ON || PART[i].toFEM==ON)
 		{
@@ -2688,7 +2796,7 @@ void output_newton_data3(double *w_fx, double *w_DfDx, double *n_rx, double *n_r
 	Df.close();
 }
 
-void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> HYPER,int t)
+void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> HYPER, int t)
 {
 //	cout<<"íeê´É|ÉeÉìÉVÉÉÉãåvéZ";
 	int h_num=HYPER.size();
@@ -2868,8 +2976,8 @@ void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> 
 	{
 		vv=HYPER[i].p[0]*HYPER[i].p[0]+HYPER[i].p[1]*HYPER[i].p[1]+HYPER[i].p[2]*HYPER[i].p[2];
 		//energy=0.5/mi*vv+W[i]*V+HYPER[i].lambda*(1-HYPER[i].J)*V;
-		if(CON.get_flag_G()==ON)	energy=0.5/mi*vv+mi*G*PART[i].r[A_Z]+W[i]*V+HYPER[i].lambda*(1-HYPER[i].J)*V;
-		if(CON.get_flag_G()==OFF)	energy=0.5/mi*vv+W[i]*V+HYPER[i].lambda*(1-HYPER[i].J)*V;
+		energy=0.5/mi*vv+W[i]*V+HYPER[i].lambda*(1-HYPER[i].J)*V;
+		if(CON.get_flag_G()==ON)	energy+=mi*G*PART[i].r[A_Z];
 		sum_e_T+=0.5/mi*vv;
 		sum_e_g+=mi*G*PART[i].r[A_Z];
 		sum_e_lam+=HYPER[i].lambda*(1-HYPER[i].J)*V;

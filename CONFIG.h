@@ -296,13 +296,14 @@ class mpsconfig
 	int flag_ELAST;
 	int flag_HYPER;
 	int flag_GRAVITY;
+	int flag_vis;
+	int flag_wall;
 	double hyper_density;
 	double c01;
 	double c10;
 	double r_z_wall;
 	double h_dis;
 	double h_vis;
-	int flag_vis;
 	int tension_test;	//ˆø‚Á’£‚èŒ±‰ğÍ—p15/2/8
 	int nr_time;
 
@@ -593,12 +594,13 @@ public:
 	int get_flag_ELAST(){return flag_ELAST;}
 	int get_flag_HYPER(){return flag_HYPER;}
 	int get_flag_G(){return flag_GRAVITY;}
+	int get_flag_vis(){return flag_vis;}
+	int get_flag_wall(){return flag_wall;}
 	double get_hyper_density(){return hyper_density;}
 	double get_c10(){return c10;}
 	double get_c01(){return c01;}
 	double get_h_dis(){return h_dis;}
 	double get_h_viscousity(){return h_vis;}
-	int get_flag_vis(){return flag_vis;}
 	int get_nr(){return nr_time;}
 };
 
