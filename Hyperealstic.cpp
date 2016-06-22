@@ -1,6 +1,7 @@
 #include "stdafx.h"	
 
 void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F,int t);
+void data_include(int &flag_ELAST, int &flag_G, int &flag_vis, int &flag_wall, double &hyper_density, double &c10, double &c01, double &h_dis, double &h_vis,int &nr_time);
 void calc_half_p_w(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F,int t);
 void calc_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F);
 void iterative_calculation(mpsconfig &CON, vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> HYPER1,double **F,int t);
@@ -37,6 +38,19 @@ void GaussSeidelvh(double *A, int pn, double *b,double ep);
 
 void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1,int t,double **F)
 {	
+	data_include(flag_ELAST, flag_G, flag_vis, flag_wall, hyper_density, c10,c01,h_dis,h_vis,nr_time);
+
+	flag_ELAST=OFF;
+	flag_HYPER=ON;
+	flag_GRAVITY=OFF;
+	flag_vis=ON;
+	flag_wall=ON;
+	hyper_density=1000;          //water:997.04  ÉGÉ^ÉmÅ[Éã:798[kg/m3]
+	c10=30000;//30000;
+	c01=20000;//20000;
+	h_dis=1.9*distancebp;
+	h_vis=1;
+	nr_time=1000;	//15/2/8
 
 	ofstream time("time_log.dat",ios::app);
 	clock_t	start_t=clock();
@@ -83,6 +97,36 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	clock_t end_t=clock();
 	time<<end_t*CLOCKS_PER_SEC<<"	";
 	time.close();
+}
+void data_include(int &flag_ELAST, int &flag_G, int &flag_vis, int &flag_wall, double &hyper_density, double &c10, double &c01, double &h_dis, double &h_vis,int &nr_time)
+{
+	char c[256];
+	FILE *fo;
+/*	cout<<"File name?->";
+	cin>>c;*/
+	fopen_s(&fo, "hyper_config.txt","r");
+	
+	double temp[30];
+	int count=0;
+
+	while(!feof(fo)){
+		fscanf_s(fo, "%*s %lf\n", &temp[count]);
+		cout<<temp[count]<<endl;
+		count++;
+	}
+
+	flag_ELAST=temp[0];
+	flag_G=temp[1];
+	flag_vis=temp[2];
+	flag_wall=temp[3];
+	hyper_density=temp[4];
+	c10=temp[5];
+	c01=temp[6];
+	h_dis=temp[7];
+	h_vis=temp[8];
+	nr_time=temp[9];
+
+	cout<<"File is closed."<<endl;
 }
 
 void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &HYPER,vector<hyperelastic2> &HYPER1)

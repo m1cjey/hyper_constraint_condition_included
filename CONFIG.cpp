@@ -326,15 +326,6 @@ mpsconfig::mpsconfig()
 //í¥íeê´åvéZ 
 	flag_ELAST=OFF;
 	flag_HYPER=ON;
-	flag_GRAVITY=OFF;
-	flag_vis=ON;
-	flag_wall=ON;
-	hyper_density=1000;          //water:997.04  ÉGÉ^ÉmÅ[Éã:798[kg/m3]
-	c10=30000;//30000;
-	c01=20000;//20000;
-	h_dis=1.9*distancebp;
-	h_vis=1;
-	nr_time=1000;	//15/2/8
 }
 
 
