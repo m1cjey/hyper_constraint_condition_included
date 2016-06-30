@@ -6,7 +6,7 @@ class hyperelastic
 public:
 
 	unsigned ID;
-	int NEI[500];
+	int NEI[600];
 	int N;
 	double pnd0;
 	int flag_wall;
