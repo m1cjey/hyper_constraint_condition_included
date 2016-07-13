@@ -26,7 +26,7 @@ mpsconfig::mpsconfig()
 	FEMCG=2;				//FEMにおける行列解法 0:CG 1:ICCG 2:並列ICCG 3:MRTR 4:ICMRTR
 
 //	dt= (switch_FEM==OFF) ? 1.0e-5: 5.0e-6; //0.0001;不安定要因！ 0.00001:推奨(Courant数考えて) //Cf. dt_for_FEM=0.000001/2;
-	dt=1e-4;
+	dt=5e-5;
 	dt_for_FEM=5.0e-6;
 	//FEMだと0.000001で止まる・・・
 	current_step=2;
@@ -107,7 +107,7 @@ mpsconfig::mpsconfig()
 	///////////////////
 //粒子配置用
 	fluidwidth=21; //30;//40//15[個]	//fluidwidth=20*2;
-	distancebp=0.1;///0.001/2;//0.005; //distancebp=0.0125;[mm]
+	distancebp=0.05;///0.001/2;//0.005; //distancebp=0.0125;[mm]
 	wlength=2;
 	height=0.0;//0.005;    
 
@@ -330,7 +330,7 @@ mpsconfig::mpsconfig()
 	hyper_density=1000;          //water:997.04  エタノール:798[kg/m3]
 	c10=30000;//30000;
 	c01=20000;//20000;
-	h_dis=1.9*distancebp;
+	h_dis=3.8*distancebp;
 	h_vis=1;
 	flag_vis=OFF;
 	nr_time=5000;	//15/2/8

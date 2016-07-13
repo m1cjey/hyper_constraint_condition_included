@@ -135,10 +135,10 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 			int j=Nw_n[i];
 			double p_norm=sqrt(HYPER[j].p[A_X]*HYPER[j].p[A_X]+HYPER[j].p[A_Y]*HYPER[j].p[A_Y]+HYPER[j].p[A_Z]*HYPER[j].p[A_Z]);
 			double p_vector[DIMENSION]={HYPER[j].p[A_X]/p_norm,HYPER[j].p[A_Y]/p_norm,HYPER[j].p[A_Z]/p_norm};
-			double E=0.5/mi*(HYPER[j].p[A_X]*HYPER[j].p[A_X]+HYPER[j].p[A_Y]*HYPER[j].p[A_Y]+HYPER[j].p[A_Z]*HYPER[j].p[A_Z])+(0.5/mi*old_hpz[j]*old_hpz[j]-0.5/mi*HYPER[j].half_p[A_Z]*HYPER[j].half_p[A_Z]);
-			HYPER[j].p[A_X]=p_vector[A_X]*sqrt(2*E);
-			HYPER[j].p[A_Y]=p_vector[A_Y]*sqrt(2*E);
-			HYPER[j].p[A_Z]=p_vector[A_Z]*sqrt(2*E);//*/
+			double E=0.5/mi/mi*(HYPER[j].p[A_X]*HYPER[j].p[A_X]+HYPER[j].p[A_Y]*HYPER[j].p[A_Y]+HYPER[j].p[A_Z]*HYPER[j].p[A_Z])+(0.5/mi/mi*old_hpz[j]*old_hpz[j]-0.5/mi/mi*HYPER[j].half_p[A_Z]*HYPER[j].half_p[A_Z]);
+			HYPER[j].p[A_X]=mi*p_vector[A_X]*sqrt(2*E);
+			HYPER[j].p[A_Y]=mi*p_vector[A_Y]*sqrt(2*E);
+			HYPER[j].p[A_Z]=mi*p_vector[A_Z]*sqrt(2*E);//*/ //c1_v1_wall_dl0.5_2
 		}//*/
 		delete[]	Nw_n;
 		delete[]	old_hpz;
@@ -823,7 +823,7 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 			n_rx[i]+=Dt*(HYPER[i].p[A_X]+Dt*0.5*p_half_p[A_X])/mi;
 			n_ry[i]+=Dt*(HYPER[i].p[A_Y]+Dt*0.5*p_half_p[A_Y])/mi;
 			n_rz[i]+=Dt*(HYPER[i].p[A_Z]+Dt*0.5*p_half_p[A_Z])/mi;
-
+//			cout<<"r["<<i<<"]="<<n_rx[i]<<", "<<n_ry[i]<<", "<<n_rz[i]<<endl;
 			if(CON.get_flag_wall()==ON)
 			{
 				if(n_rz[i]<0)
@@ -841,7 +841,6 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 		}*/
 	}
 
-	for(int i=0;i<16;i++)	
 
 
 	////DgDq‚Æfx‚ÌXV
@@ -858,12 +857,15 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 		double part_dgdq_z=0;
 		double part_g=0;
 		double pnd=0;
-
+		
+//		cout<<"Ni="<<Ni<<endl;
 		for(int in=0;in<Ni;in++)
 		{
 			int inn=HYPER[i].NEI[in];
 			double w=HYPER1[i*h_num+inn].wiin;
-
+			
+//			cout<<"i["<<i<<"]j["<<inn<<"]="<<n_rx[inn]-n_rx[i]<<", "<<n_ry[inn]-n_ry[i]<<", "<<n_rz[inn]-n_rz[i]<<endl;
+//			cout<<"rz_inn["<<inn<<"]="<<n_rz[inn]<<", rz_i["<<i<<"]="<<n_rz[i]<<endl;
 			fi[0][0]+=w*(n_rx[inn]-n_rx[i])*HYPER1[i*h_num+inn].aiin[A_X];
 			fi[0][1]+=w*(n_rx[inn]-n_rx[i])*HYPER1[i*h_num+inn].aiin[A_Y];
 			fi[0][2]+=w*(n_rx[inn]-n_rx[i])*HYPER1[i*h_num+inn].aiin[A_Z];
@@ -904,8 +906,13 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 		p_Fi[2][1]=fi[2][0]*HYPER[i].inverse_Ai[0][1]+fi[2][1]*HYPER[i].inverse_Ai[1][1]+fi[2][2]*HYPER[i].inverse_Ai[2][1];
 		p_Fi[2][2]=fi[2][0]*HYPER[i].inverse_Ai[0][2]+fi[2][1]*HYPER[i].inverse_Ai[1][2]+fi[2][2]*HYPER[i].inverse_Ai[2][2];
 
+//		cout<<"F"<<i<<"="<<p_Fi[0][0]<<", "<<p_Fi[0][1]<<", "<<p_Fi[0][2]<<endl;
+//		cout<<p_Fi[1][0]<<", "<<p_Fi[1][1]<<", "<<p_Fi[1][2]<<endl;
+//		cout<<p_Fi[2][0]<<", "<<p_Fi[2][1]<<", "<<p_Fi[2][2]<<endl;
+
 		//J‚ÌŒvŽZ
 		double J=calc_det3(p_Fi);
+//		cout<<"J"<<i<<"="<<J<<endl;
 
 /*		double part_dgdq_x=0;
 		double part_dgdq_y=0;
@@ -927,6 +934,7 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 		//fx‚ÌŒvŽZ
 //		fx[i]=V*(1-J+part_g);//1-J;//
 		fx[i]=V*(1-J);//1-J;//
+//		cout<<"fx"<<i<<"="<<V*(1-J)<<endl;
 
 		//t_inverse_Fi‚ÌŒvŽZ
 		inverse(p_Fi,DIMENSION);
