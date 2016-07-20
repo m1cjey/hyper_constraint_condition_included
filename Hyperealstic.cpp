@@ -79,7 +79,6 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		calc_differential_p(CON,PART,HYPER,HYPER1,F);
 		renew_lambda(CON,PART,HYPER,HYPER1,t);
 		calc_half_p(CON,PART,HYPER,HYPER1,1,F);
-
 	}
 	else
 	{
@@ -98,30 +97,42 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		ofstream fs(ss.str());
 
 		stringstream ss2;
-		ss2<<"./Half_P/half_p_before_r_changed"<<t<<".csv";
+		ss2<<"./Position/position_after_r_changed"<<t<<".csv";
 		ofstream fs2(ss2.str());
+
+		stringstream ss3;
+		ss3<<"./Half_P/half_p_before_r_changed"<<t<<".csv";
+		ofstream fs3(ss3.str());
+
+		stringstream ss4;
+		ss4<<"./Half_P/half_p_after_r_changed"<<t<<".csv";
+		ofstream fs4(ss4.str());
 
 		double *old_hpz=new double [h_num];
 		int Nw=0;
-
 		for(int i=0;i<h_num;i++)
 		{
 			old_hpz[i]=HYPER[i].half_p[A_Z];
 			fs<<i<<","<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<",";
-			fs2<<i<<","<<HYPER[i].half_p[A_X]<<","<<HYPER[i].half_p[A_Y]<<","<<HYPER[i].half_p[A_Z]<<endl;
+			fs3<<i<<","<<HYPER[i].half_p[A_X]<<","<<HYPER[i].half_p[A_Y]<<","<<HYPER[i].half_p[A_Z]<<",";
 			if(PART[i].r[A_Z]<0)
 			{
 				PART[i].r[A_Z]=0;
 				HYPER[i].half_p[A_Z]=-1*old_r_z[i]/Dt*mi;
 				Nw_n[Nw]=i;
 				Nw++;
-				fs<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z];
+				fs2<<i<<","<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<endl;
+				fs4<<i<<","<<HYPER[i].half_p[A_X]<<","<<HYPER[i].half_p[A_Y]<<","<<HYPER[i].half_p[A_Z]<<endl;
 			}
+			fs<<endl;
+			fs2<<endl;
+			fs3<<endl;
 			fs<<endl;
 		}
 		fs.close();
 		fs2.close();
-
+		fs3.close();
+		fs4.close();
 		delete[]	old_r_z;
 
 		calc_F(CON,PART,HYPER,HYPER1);
@@ -130,25 +141,38 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		renew_lambda(CON,PART,HYPER,HYPER1,t);
 		calc_half_p(CON,PART,HYPER,HYPER1,1,F);
 
+		stringstream ss5;
+		ss5<<"./P/P_before_r_changed"<<t<<".csv";
+		ofstream fs5(ss5.str());
+		for(int i=0;i<h_num;i++)	fs5<<i<<","<<HYPER[i].p[A_X]<<","<<HYPER[i].p[A_Y]<<","<<HYPER[i].p[A_Z]<<endl;
+		fs5.close();
+
 		for(int i=0;i<Nw;i++)
 		{
 			int j=Nw_n[i];
 			double p_norm=sqrt(HYPER[j].p[A_X]*HYPER[j].p[A_X]+HYPER[j].p[A_Y]*HYPER[j].p[A_Y]+HYPER[j].p[A_Z]*HYPER[j].p[A_Z]);
 			double p_vector[DIMENSION]={HYPER[j].p[A_X]/p_norm,HYPER[j].p[A_Y]/p_norm,HYPER[j].p[A_Z]/p_norm};
-			double E=0.5/mi/mi*(HYPER[j].p[A_X]*HYPER[j].p[A_X]+HYPER[j].p[A_Y]*HYPER[j].p[A_Y]+HYPER[j].p[A_Z]*HYPER[j].p[A_Z])+(0.5/mi/mi*old_hpz[j]*old_hpz[j]-0.5/mi/mi*HYPER[j].half_p[A_Z]*HYPER[j].half_p[A_Z]);
-			HYPER[j].p[A_X]=mi*p_vector[A_X]*sqrt(2*E);
-			HYPER[j].p[A_Y]=mi*p_vector[A_Y]*sqrt(2*E);
-			HYPER[j].p[A_Z]=mi*p_vector[A_Z]*sqrt(2*E);//*/ //c1_v1_wall_dl0.5_2
+			double E=0.5/mi*(HYPER[j].p[A_X]*HYPER[j].p[A_X]+HYPER[j].p[A_Y]*HYPER[j].p[A_Y]+HYPER[j].p[A_Z]*HYPER[j].p[A_Z])+(0.5/mi*old_hpz[j]*old_hpz[j]-0.5/mi*HYPER[j].half_p[A_Z]*HYPER[j].half_p[A_Z]);
+			HYPER[j].p[A_X]=mi*p_vector[A_X]*sqrt(2/mi*E);
+			HYPER[j].p[A_Y]=mi*p_vector[A_Y]*sqrt(2/mi*E);
+			HYPER[j].p[A_Z]=mi*p_vector[A_Z]*sqrt(2/mi*E);	//*/ //c1_v1_wall_dl0.5_2
 		}//*/
 		delete[]	Nw_n;
 		delete[]	old_hpz;
 
 		if(Nw>0)
 		{
+			stringstream ss6;
+			ss6<<"./P/P_after_r_changed"<<t<<".csv";
+			ofstream fs6(ss6.str());
+			for(int i=0;i<h_num;i++)	fs6<<i<<","<<HYPER[i].p[A_X]<<","<<HYPER[i].p[A_Y]<<","<<HYPER[i].p[A_Z]<<endl;
+			fs6.close();
+
 			double ep=1e-5;
 			double dX=1;
 			double *old_X=new double [h_num];
 			int count=0;
+
 
 			while(dX>ep)
 			{
@@ -161,6 +185,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 					HYPER[i].half_p[A_Y]=HYPER[i].p[A_Y];
 					HYPER[i].half_p[A_Z]=HYPER[i].p[A_Z];
 				}
+			
 				calc_differential_p(CON,PART,HYPER,HYPER1,F);
 				renew_lambda(CON,PART,HYPER,HYPER1,t);
 				calc_half_p(CON,PART,HYPER,HYPER1,1,F);
@@ -170,43 +195,56 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				for(int i=0;i<h_num;i++)
 				{
 					dX_d+=fabs(old_X[i]);
-					dX+=fabs(old_X[i]-HYPER[i].lambda);
+					dX+=fabs(HYPER[i].lambda-old_X[i]);
 				}
 				dX/=dX_d;
 
-				if(count%2500==1)
-				{
-					cout<<"count"<<count<<" ,E"<<dX<<endl;
-
-					//o—Í
-					stringstream ss_E;
-					ss_E<<"./Wall/E"<<t<<".csv";	
-					stringstream ss_lam;
-					ss_lam<<"./Wall/lambda"<<t<<".csv";		
-					if(count==1)
-					{
-						ofstream init0(ss_E.str(), ios::trunc);
-						ofstream init1(ss_lam.str(), ios::trunc);
+				//o—Í
+				stringstream ss_E;
+				ss_E<<"./Wall/E"<<t<<".csv";	
+				stringstream ss_lam;
+				ss_lam<<"./Wall/lambda"<<t<<".csv";		
+				stringstream ss_hp;
+				ss_hp<<"./Wall/half_p"<<t<<".csv";	
+				stringstream ss_p;
+				ss_p<<"./Wall/p"<<t<<".csv";	
 	
-						init0.close();
-						init1.close();
-					}
-					ofstream e(ss_E.str(), ios::app);
-					ofstream lam(ss_lam.str(), ios::app);
-					if(count==1)
-					{
-						e<<"count"<<","<<"E"<<endl;
-						lam<<"count"<<","<<"lambda"<<endl;
-						for(int i=0;i<h_num;i++)	lam<<","<<i;
-						lam<<endl;
-					}	
-					e<<count<<","<<dX<<endl;
-					lam<<count;
-					for(int i=0;i<h_num;i++)	lam<<","<<HYPER[i].lambda;
-					lam<<endl;
-					e.close();
-					lam.close();
+				if(count==1)
+				{
+					ofstream init0(ss_E.str(), ios::trunc);
+					ofstream init1(ss_lam.str(), ios::trunc);
+					ofstream init2(ss_hp.str(), ios::trunc);
+					ofstream init3(ss_p.str(), ios::trunc);
+	
+					init0.close();
+					init1.close();
+					init2.close();
+					init3.close();
 				}
+				ofstream e(ss_E.str(), ios::app);
+				ofstream lam(ss_lam.str(), ios::app);
+				ofstream hp(ss_hp.str(), ios::app);
+				ofstream p(ss_p.str(), ios::app);
+
+				e<<count<<","<<dX<<endl;
+				lam<<count;
+				hp<<count;
+				p<<count;
+
+				for(int i=0;i<h_num;i++)
+				{
+					lam<<","<<HYPER[i].lambda;
+					hp<<","<<HYPER[i].half_p[A_X]<<","<<HYPER[i].half_p[A_Y]<<","<<HYPER[i].half_p[A_Z]<<endl;
+					p<<","<<HYPER[i].p[A_X]<<","<<HYPER[i].p[A_Y]<<","<<HYPER[i].p[A_Z]<<endl;
+				}
+
+				lam<<endl;
+				e.close();
+				lam.close();
+				hp.close();
+				p.close();
+
+				if(count%2500==1)	cout<<"count"<<count<<" ,E"<<dX<<endl;
 				if(count>5000)	break;
 			}
 			ofstream fsw("Convergence_rate.csv", ios::app);
