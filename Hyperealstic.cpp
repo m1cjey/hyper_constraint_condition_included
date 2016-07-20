@@ -109,10 +109,18 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		ofstream fs4(ss4.str());
 
 		double *old_hpz=new double [h_num];
+		double *pn_x=new double [h_num];
+		double *pn_y=new double [h_num];
+		double *pn_z=new double [h_num];
+
 		int Nw=0;
 		for(int i=0;i<h_num;i++)
 		{
 			old_hpz[i]=HYPER[i].half_p[A_Z];
+			pn_x[i]=HYPER[i].p[A_X];
+			pn_y[i]=HYPER[i].p[A_Y];
+			pn_z[i]=HYPER[i].p[A_Z];
+
 			fs<<i<<","<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<",";
 			fs3<<i<<","<<HYPER[i].half_p[A_X]<<","<<HYPER[i].half_p[A_Y]<<","<<HYPER[i].half_p[A_Z]<<",";
 			if(PART[i].r[A_Z]<0)
@@ -134,6 +142,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		fs3.close();
 		fs4.close();
 		delete[]	old_r_z;
+		
 
 		calc_F(CON,PART,HYPER,HYPER1);
 		calc_stress(CON,HYPER);	
@@ -181,11 +190,26 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				for(int i=0;i<h_num;i++)
 				{
 					old_X[i]=HYPER[i].lambda;
-					HYPER[i].half_p[A_X]=HYPER[i].p[A_X];
-					HYPER[i].half_p[A_Y]=HYPER[i].p[A_Y];
-					HYPER[i].half_p[A_Z]=HYPER[i].p[A_Z];
+					PART[i].r[A_X]-=Dt/mi*HYPER[i].half_p[A_X];
+					PART[i].r[A_Y]-=Dt/mi*HYPER[i].half_p[A_Y];
+					PART[i].r[A_Z]-=Dt/mi*HYPER[i].half_p[A_Z];
+
+					HYPER[i].half_p[A_X]+=HYPER[i].p[A_X]-pn_x[i];
+					HYPER[i].half_p[A_Y]+=HYPER[i].p[A_Y]-pn_y[i];
+					HYPER[i].half_p[A_Z]+=HYPER[i].p[A_Z]-pn_z[i];
+
+					PART[i].r[A_X]+=Dt/mi*HYPER[i].half_p[A_X];
+					PART[i].r[A_Y]+=Dt/mi*HYPER[i].half_p[A_Y];
+					PART[i].r[A_Z]+=Dt/mi*HYPER[i].half_p[A_Z];
+
+					pn_x[i]=HYPER[i].p[A_X];
+					pn_y[i]=HYPER[i].p[A_Y];
+					pn_z[i]=HYPER[i].p[A_Z];
 				}
-			
+
+
+				calc_F(CON,PART,HYPER,HYPER1);
+				calc_stress(CON,HYPER);	
 				calc_differential_p(CON,PART,HYPER,HYPER1,F);
 				renew_lambda(CON,PART,HYPER,HYPER1,t);
 				calc_half_p(CON,PART,HYPER,HYPER1,1,F);
@@ -253,6 +277,9 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 			delete[]	old_X;
 		}
+		delete[]	pn_x;
+		delete[]	pn_y;
+		delete[]	pn_z;
 	}
 	
 
