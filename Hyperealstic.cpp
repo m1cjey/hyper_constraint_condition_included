@@ -70,7 +70,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	newton_raphson(CON,PART,HYPER,HYPER1,t,F);
 
 	int f_wall=CON.get_flag_wall();
-
+	//•ÇŒvŽZ–³
 	if(f_wall==OFF)
 	{
 		calc_half_p(CON,PART,HYPER,HYPER1,0,F);
@@ -80,6 +80,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		renew_lambda(CON,PART,HYPER,HYPER1,t);
 		calc_half_p(CON,PART,HYPER,HYPER1,1,F);
 	}
+	//•ÇŒvŽZ—L
 	else
 	{
 		double *old_r_z=new double [h_num];
@@ -112,6 +113,9 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		double *pn_x=new double [h_num];
 		double *pn_y=new double [h_num];
 		double *pn_z=new double [h_num];
+		double *rn_x=new double [h_num];
+		double *rn_y=new double [h_num];
+		double *rn_z=new double [h_num];
 
 		int Nw=0;
 		for(int i=0;i<h_num;i++)
@@ -132,6 +136,10 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				fs2<<i<<","<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<endl;
 				fs4<<i<<","<<HYPER[i].half_p[A_X]<<","<<HYPER[i].half_p[A_Y]<<","<<HYPER[i].half_p[A_Z]<<endl;
 			}
+			rn_x[i]=PART[i].r[A_X];
+			rn_y[i]=PART[i].r[A_Y];
+			rn_z[i]=PART[i].r[A_Z];
+
 			fs<<endl;
 			fs2<<endl;
 			fs3<<endl;
@@ -169,6 +177,8 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		delete[]	Nw_n;
 		delete[]	old_hpz;
 
+
+		//ŒJ‚è•Ô‚µŒvŽZ	
 		if(Nw>0)
 		{
 			stringstream ss6;
@@ -187,33 +197,54 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 			{
 				count++;
 
-				for(int i=0;i<h_num;i++)
+				int way=1;
+				//•û–@0
+				if(way==0)
 				{
-					old_X[i]=HYPER[i].lambda;
-					PART[i].r[A_X]-=Dt/mi*HYPER[i].half_p[A_X];
-					PART[i].r[A_Y]-=Dt/mi*HYPER[i].half_p[A_Y];
-					PART[i].r[A_Z]-=Dt/mi*HYPER[i].half_p[A_Z];
+					for(int i=0;i<h_num;i++)
+					{
+						old_X[i]=HYPER[i].lambda;
 
-					HYPER[i].half_p[A_X]+=HYPER[i].p[A_X]-pn_x[i];
-					HYPER[i].half_p[A_Y]+=HYPER[i].p[A_Y]-pn_y[i];
-					HYPER[i].half_p[A_Z]+=HYPER[i].p[A_Z]-pn_z[i];
+						HYPER[i].half_p[A_X]+=HYPER[i].p[A_X]-pn_x[i];
+						HYPER[i].half_p[A_Y]+=HYPER[i].p[A_Y]-pn_y[i];
+						HYPER[i].half_p[A_Z]+=HYPER[i].p[A_Z]-pn_z[i];
+	
+						pn_x[i]=HYPER[i].p[A_X];
+						pn_y[i]=HYPER[i].p[A_Y];
+						pn_z[i]=HYPER[i].p[A_Z];
+					}
 
-					PART[i].r[A_X]+=Dt/mi*HYPER[i].half_p[A_X];
-					PART[i].r[A_Y]+=Dt/mi*HYPER[i].half_p[A_Y];
-					PART[i].r[A_Z]+=Dt/mi*HYPER[i].half_p[A_Z];
+					calc_differential_p(CON,PART,HYPER,HYPER1,F);
+					renew_lambda(CON,PART,HYPER,HYPER1,t);
+					calc_half_p(CON,PART,HYPER,HYPER1,1,F);
+			
+				}
+				else if(way==1)
+				{
+					for(int i=0;i<h_num;i++)
+					{
+						old_X[i]=HYPER[i].lambda;
 
-					pn_x[i]=HYPER[i].p[A_X];
-					pn_y[i]=HYPER[i].p[A_Y];
-					pn_z[i]=HYPER[i].p[A_Z];
+						HYPER[i].half_p[A_X]+=HYPER[i].p[A_X]-pn_x[i];
+						HYPER[i].half_p[A_Y]+=HYPER[i].p[A_Y]-pn_y[i];
+						HYPER[i].half_p[A_Z]+=HYPER[i].p[A_Z]-pn_z[i];
+	
+						pn_x[i]=HYPER[i].p[A_X];
+						pn_y[i]=HYPER[i].p[A_Y];
+						pn_z[i]=HYPER[i].p[A_Z];
+					}
+
+					calc_differential_p(CON,PART,HYPER,HYPER1,F);
+					renew_lambda(CON,PART,HYPER,HYPER1,t);
+					calc_half_p(CON,PART,HYPER,HYPER1,1,F);
+		
+					gauss(DfDx,fx,h_num);
+					//double ep=CON.get_FEMCGep();
+					///*GaussSeidelvh(DfDx,h_num,fx,ep);
+					for(int i=0;i<h_num;i++)	XX[i]-=fx[i];//*0.5*mi/(Dt*Dt)*V*fx[i];//*/
+
 				}
 
-
-				calc_F(CON,PART,HYPER,HYPER1);
-				calc_stress(CON,HYPER);	
-				calc_differential_p(CON,PART,HYPER,HYPER1,F);
-				renew_lambda(CON,PART,HYPER,HYPER1,t);
-				calc_half_p(CON,PART,HYPER,HYPER1,1,F);
-			
 				dX=0;
 				double dX_d=0;
 				for(int i=0;i<h_num;i++)
@@ -271,6 +302,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				if(count%2500==1)	cout<<"count"<<count<<" ,E"<<dX<<endl;
 				if(count>5000)	break;
 			}
+
 			ofstream fsw("Convergence_rate.csv", ios::app);
 			fsw<<count<<","<<dX<<endl;
 			fsw.close();
@@ -280,6 +312,9 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		delete[]	pn_x;
 		delete[]	pn_y;
 		delete[]	pn_z;
+		delete[]	rn_x;
+		delete[]	rn_y;
+		delete[]	rn_z;
 	}
 	
 
