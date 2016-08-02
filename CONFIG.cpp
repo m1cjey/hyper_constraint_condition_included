@@ -20,7 +20,7 @@ mpsconfig::mpsconfig()
 	fin.close();*/
 	
 	step=10000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
-	switch_FEM=false;		//FEMを実行するかしないか false
+	switch_FEM=true;		//FEMを実行するかしないか false
 	nonlinear_elastic=false;	//弾性体非線形計算するかtrue
 	switch_vis=OFF;			//粘性項計算するかしないか・・・これはあとで消す
 	FEMCG=2;				//FEMにおける行列解法 0:CG 1:ICCG 2:並列ICCG 3:MRTR 4:ICMRTR
@@ -326,13 +326,13 @@ mpsconfig::mpsconfig()
 //超弾性計算 
 	flag_ELAST=OFF;
 	flag_HYPER=ON;
-	flag_GRAVITY=OFF;
+	flag_GRAVITY=ON;
 	hyper_density=1000;          //water:997.04  エタノール:798[kg/m3]
-	c10=30000;//30000;
-	c01=20000;//20000;
+	c10=3000000;//30000;
+	c01=2000000;//20000;
 	h_dis=3.8*distancebp;
 	h_vis=1;
-	flag_vis=OFF;
+	flag_vis=ON;
 	nr_time=5000;	//15/2/8
 	flag_wall=ON;
 }
