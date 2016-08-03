@@ -56,8 +56,8 @@ mpsconfig::mpsconfig()
 	avoid_step7=10710;*/
 
 //出力動画
-	flag_cut_x_movie=OFF;
-	flag_cut_y_movie=OFF;
+	flag_cut_x_movie=ON;
+	flag_cut_y_movie=ON;
 
 //電磁力計算
 	region_shape=1;//1;		//解析領域形状　0=立方体 1=円筒
@@ -328,8 +328,8 @@ mpsconfig::mpsconfig()
 	flag_HYPER=ON;
 	flag_GRAVITY=ON;
 	hyper_density=1000;          //water:997.04  エタノール:798[kg/m3]
-	c10=3000000;//30000;
-	c01=2000000;//20000;
+	c10=30000;//30000;
+	c01=20000;//20000;
 	h_dis=3.8*distancebp;
 	h_vis=1;
 	flag_vis=ON;
