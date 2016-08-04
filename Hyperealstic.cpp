@@ -107,6 +107,15 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				HYPER[i].half_p[A_Z]=-1*old_r_z[i]/Dt*mi;
 				Nw_n[Nw]=i;
 				Nw++;
+
+				//前半でエネルギーロスを補う方法
+				double old_E=0.5/mi*(HYPER[i].half_p[A_X]*HYPER[i].half_p[A_X]+HYPER[i].half_p[A_Y]*HYPER[i].half_p[A_Y]+old_hpz[i]*old_hpz[i]-HYPER[i].half_p[A_Z]*HYPER[i].half_p[A_Z]);
+				double norm=sqrt(HYPER[i].half_p[A_X]*HYPER[i].half_p[A_X]+HYPER[i].half_p[A_Y]*HYPER[i].half_p[A_Y]);
+				double vec_hpx=HYPER[i].half_p[A_X]/norm;
+				double vec_hpy=HYPER[i].half_p[A_Y]/norm;
+
+				HYPER[i].half_p[A_X]=vec_hpx*sqrt(2*mi*old_E);
+				HYPER[i].half_p[A_Y]=vec_hpy*sqrt(2*mi*old_E);
 			}
 		}
 		
@@ -157,21 +166,22 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 		delete[]	old_r_z;
 
-		for(int i=0;i<Nw;i++)
+		//後半でエネルギーロスを補う方法
+		/*for(int i=0;i<Nw;i++)
 		{
 			int j=Nw_n[i];
 			double p_norm=sqrt(HYPER[j].p[A_X]*HYPER[j].p[A_X]+HYPER[j].p[A_Y]*HYPER[j].p[A_Y]+HYPER[j].p[A_Z]*HYPER[j].p[A_Z]);
 			double p_vector[DIMENSION]={HYPER[j].p[A_X]/p_norm,HYPER[j].p[A_Y]/p_norm,HYPER[j].p[A_Z]/p_norm};
 			double E=0.5/mi*(HYPER[j].p[A_X]*HYPER[j].p[A_X]+HYPER[j].p[A_Y]*HYPER[j].p[A_Y]+HYPER[j].p[A_Z]*HYPER[j].p[A_Z])+(0.5/mi*old_hpz[j]*old_hpz[j]-0.5/mi*HYPER[j].half_p[A_Z]*HYPER[j].half_p[A_Z]);
-			HYPER[j].p[A_X]=mi*p_vector[A_X]*sqrt(2/mi*E);
-			HYPER[j].p[A_Y]=mi*p_vector[A_Y]*sqrt(2/mi*E);
-			HYPER[j].p[A_Z]=mi*p_vector[A_Z]*sqrt(2/mi*E);	//*/ //c1_v1_wall_dl0.5_2
-		}//*/
-		delete[]	Nw_n;
+			HYPER[j].p[A_X]=mi*p_vector[A_X]*sqrt(2*mi*E);
+			HYPER[j].p[A_Y]=mi*p_vector[A_Y]*sqrt(2*mi*E);
+			HYPER[j].p[A_Z]=mi*p_vector[A_Z]*sqrt(2*mi*E);	
+		}
+		delete[]	Nw_n;//*/ //c1_v1_wall_dl0.5_2
 
 		
 		//繰り返し計算	
-		if(Nw>0)
+/*		if(Nw>0)
 		{
 			stringstream ss6;
 			ss6<<"./P/P_after_p_changed"<<t<<".csv";
@@ -189,9 +199,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 			{
 				count++;
 
-				int way=1;
 				//単純な繰り返し計算
-				/*
 				for(int i=0;i<h_num;i++)
 				{
 					old_X[i]=HYPER[i].lambda;
@@ -207,8 +215,9 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 				calc_differential_p(CON,PART,HYPER,HYPER1,F);
 				renew_lambda(CON,PART,HYPER,HYPER1,t);
-				calc_half_p(CON,PART,HYPER,HYPER1,1,F);//*/
+				calc_half_p(CON,PART,HYPER,HYPER1,1,F);//
 			
+
 				//Newton-Raphson法
 				double *fx=new double [h_num];
 				double *DfDx=new double [h_num*h_num];
@@ -233,7 +242,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				//double ep=CON.get_FEMCGep();
 				///*GaussSeidelvh(DfDx,h_num,fx,ep);
 
-				for(int i=0;i<h_num;i++)	X[i]-=fx[i];//*0.5*mi/(Dt*Dt)*V*fx[i];//*/
+				for(int i=0;i<h_num;i++)	X[i]-=fx[i];//*0.5*mi/(Dt*Dt)*V*fx[i];//
 				delete[]	fx;
 				delete[]	DfDx;
 
@@ -281,9 +290,9 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 			fsw.close();
 			delete[]	X;
 			delete[]	old_X;
-		}
+		}//*/
 		delete[]	old_hpz;
-	}
+	}//*/
 	
 
 	//	for(int i=0;i<p_num;i++)	cout<<"renew_p_x"<<i<<"="<<HYPER[i].p[A_X]<<endl;
