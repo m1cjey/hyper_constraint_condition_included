@@ -55,11 +55,9 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	{
 		ofstream init0("lambda_n1.csv",ios::trunc);
 		ofstream init1("lambda_p1.csv",ios::trunc);
-		ofstream init2("lambda_p2.csv",ios::trunc);
 		ofstream init3("lambda_n2.csv",ios::trunc);
 		init0.close();
 		init1.close();
-		init2.close();
 		init3.close();
 
 		for(int i=0;i<h_num;i++)	for(int D=0;D<DIMENSION;D++)	PART[i].q0[D]=0;
@@ -188,24 +186,25 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 			stringstream ss6;
 			ss6<<"./P/P_after_p_changed"<<t<<".csv";
 			ofstream fs6(ss6.str());
-
-			ofstream fs3("lambda_p2.csv",ios::app);
-
-			for(int i=0;i<h_num;i++)
-			{
-				fs6<<i<<","<<HYPER[i].p[A_X]<<","<<HYPER[i].p[A_Y]<<","<<HYPER[i].p[A_Z]<<endl;
-				fs3<<HYPER[i].lambda<<",";
-			}
-			fs3<<endl;
-
-			fs3.close();
+			for(int i=0;i<h_num;i++)	fs6<<i<<","<<HYPER[i].p[A_X]<<","<<HYPER[i].p[A_Y]<<","<<HYPER[i].p[A_Z]<<endl;
 			fs6.close();
 
 			double ep=1e-5;
 			double dX=1;
 			double *X=new double [h_num];
 			double *old_X=new double [h_num];
+			double *fx=new double [h_num];
+			double *DfDx=new double [h_num*h_num];
+
 			int count=0;
+
+			for(int i=0;i<h_num;i++)
+			{
+				X[i]=1;
+				old_X[i]=1;
+				fx[i]=0;
+				for(int j=0;j<h_num;j++)	DfDx[i*h_num+j]=0;
+			}
 
 			while(dX>ep)
 			{
@@ -232,22 +231,12 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				calc_half_p(CON,PART,HYPER,HYPER1,1,F);//*/
 			
 				//Newton-Raphson–@
-				double *fx=new double [h_num];
-				double *DfDx=new double [h_num*h_num];
 
 				for(int i=0;i<h_num;i++)
 				{
-					if(count==1)	//‰Šú‰»
-					{
-						X[i]=1;
-						old_X[i]=1;
-					}
-					else
-					{
-						old_X[i]=X[i];
-						fx[i]=0;
-						for(int j=0;j<h_num;j++)	DfDx[i*h_num+j]=0;
-					}
+					old_X[i]=X[i];
+					fx[i]=0;
+					for(int j=0;j<h_num;j++)	DfDx[i*h_num+j]=0;
 				}
 
 				calc_newton_function2(CON,HYPER,HYPER1,old_hpz,X,fx,DfDx,h_num,count,t,F);
@@ -256,8 +245,6 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				///*GaussSeidelvh(DfDx,h_num,fx,ep);
 
 				for(int i=0;i<h_num;i++)	X[i]-=fx[i];//*0.5*mi/(Dt*Dt)*V*fx[i];//
-				delete[]	fx;
-				delete[]	DfDx;
 
 				dX=0;
 				double dX_d=0;
@@ -278,7 +265,6 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				{
 					ofstream init0(ss_E.str(), ios::trunc);
 					ofstream init1(ss_lam.str(), ios::trunc);
-	
 					init0.close();
 					init1.close();
 				}
@@ -286,11 +272,14 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 				ofstream lam(ss_lam.str(), ios::app);
 
 				e<<count<<","<<dX<<endl;
-
+				lam<<count<<",";
 				double sum_lam=0;	
-				for(int i=0;i<h_num;i++)	sum_lam+=X[i]/h_num;
-
-				lam<<count<<","<<sum_lam<<endl;
+				for(int i=0;i<h_num;i++)
+				{
+					lam<<X[i]<<",";	//³í
+					sum_lam+=X[i];
+				}
+				lam<<sum_lam/h_num<<","<<h_num<<endl;	//³í
 				e.close();
 				lam.close();
 
@@ -302,8 +291,8 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 			for(int i=0;i<h_num;i++)
 			{
+				fs2<<X[i]<<",";	//‚±‚±‚ÅX[i]‚ª‚·‚×‚ÄƒGƒ‰[
 				HYPER[i].lambda=X[i];
-				fs2<<HYPER[i].lambda<<",";
 			}
 			fs2<<endl;
 			fs2.close();
@@ -311,8 +300,11 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 			ofstream fsw("Convergence_rate.csv", ios::app);
 			fsw<<count<<","<<dX<<endl;
 			fsw.close();
+	
 			delete[]	X;
 			delete[]	old_X;
+			delete[]	fx;
+			delete[]	DfDx;
 		}//*/
 		delete[]	old_hpz;
 	
@@ -762,7 +754,7 @@ void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> 
 		//E/=sum;
 
 
-		if(count==1 || count%2500==0)
+//		if(count==1 || count%2500==0)
 		{		
 			/*
 			cout<<"XX_old["<<i<<"]-d=X["<<i<<"]	";
@@ -1268,9 +1260,10 @@ void calc_newton_function2(mpsconfig &CON,vector<hyperelastic> &HYPER,vector<hyp
 	{
 		for(int j=0;j<h_num;j++)
 		{
-			fx[i]+=1/mi*(HYPER1[i*h_num+j].DgDq[A_X]*HYPER[j].p[A_X]+HYPER1[i*h_num+j].DgDq[A_Y]*HYPER[j].p[A_Y]+HYPER1[i*h_num+j].DgDq[A_Z]*HYPER[j].p[A_Z]);
+			fx[i]+=HYPER1[i*h_num+j].DgDq[A_X]*HYPER[j].p[A_X]+HYPER1[i*h_num+j].DgDq[A_Y]*HYPER[j].p[A_Y]+HYPER1[i*h_num+j].DgDq[A_Z]*HYPER[j].p[A_Z];
 			for(int k=0;k<h_num;k++)	DfDx[i*h_num+j]-=Dt*0.5/mi*(HYPER1[i*h_num+k].DgDq[A_X]*HYPER1[j*h_num+k].DgDq[A_X]+HYPER1[i*h_num+k].DgDq[A_Y]*HYPER1[j*h_num+k].DgDq[A_Y]+HYPER1[i*h_num+k].DgDq[A_Z]*HYPER1[j*h_num+k].DgDq[A_Z]);
 		}
+		if(fx[i]!=0)	fx[i]/=mi;
 	}//*/
 
 	output_newton2_data1(HYPER,fx,DfDx,h_num,count,t);
@@ -2529,7 +2522,7 @@ void output_hyper_data(vector<mpselastic> PART,vector<hyperelastic> HYPER,vector
 	ofstream p_an("P_ave_norm.csv", ios::app);
 	ofstream h("model_height.csv", ios::app);
 
-	if(t==1)	p<<"h_p,,d_p,,p\n";
+	if(t==1)	p<<"h_p,,,d_p,,,p\n";
 	p<<"t"<<t<<endl;
 	double sum_lam=0;
 	double sum_j=0;
@@ -2538,27 +2531,29 @@ void output_hyper_data(vector<mpselastic> PART,vector<hyperelastic> HYPER,vector
 	double h_max=PART[0].r[A_Z];
 	for(int i=0;i<h_num;i++)
 	{
-		sum_lam+=HYPER[i].lambda/h_num;
-		sum_j+=HYPER[i].J/h_num;
+	//	lam<<HYPER[i].lambda<<",";
+	//	j<<HYPER[i].J<<",";
+		sum_lam+=HYPER[i].lambda;
+		sum_j+=HYPER[i].J;
 	//	lam<<HYPER[i].lambda<<",";
 	//	j<<HYPER[i].J<<",";
 		p<<HYPER[i].half_p[A_X]<<","<<HYPER[i].half_p[A_Y]<<","<<HYPER[i].half_p[A_Z]<<","<<HYPER[i].differential_p[A_X]<<","<<HYPER[i].differential_p[A_Y]<<","<<HYPER[i].differential_p[A_Z]<<","<<HYPER[i].p[A_X]<<","<<HYPER[i].p[A_Y]<<","<<HYPER[i].p[A_Z]<<endl;
-		p_sum+=sqrt(HYPER[i].p[A_X]*HYPER[i].p[A_X]+HYPER[i].p[A_Y]*HYPER[i].p[A_Y]+HYPER[i].p[A_Z]*HYPER[i].p[A_Z])/h_num;
-		d_p_sum+=sqrt(HYPER[i].differential_p[A_X]*HYPER[i].differential_p[A_X]+HYPER[i].differential_p[A_Y]*HYPER[i].differential_p[A_Y]+HYPER[i].differential_p[A_Z]*HYPER[i].differential_p[A_Z])/h_num;
-		h_p_sum+=sqrt(HYPER[i].half_p[A_X]*HYPER[i].half_p[A_X]+HYPER[i].half_p[A_Y]*HYPER[i].half_p[A_Y]+HYPER[i].half_p[A_Z]*HYPER[i].half_p[A_Z])/h_num;
+		p_sum+=sqrt(HYPER[i].p[A_X]*HYPER[i].p[A_X]+HYPER[i].p[A_Y]*HYPER[i].p[A_Y]+HYPER[i].p[A_Z]*HYPER[i].p[A_Z]);
+		d_p_sum+=sqrt(HYPER[i].differential_p[A_X]*HYPER[i].differential_p[A_X]+HYPER[i].differential_p[A_Y]*HYPER[i].differential_p[A_Y]+HYPER[i].differential_p[A_Z]*HYPER[i].differential_p[A_Z]);
+		h_p_sum+=sqrt(HYPER[i].half_p[A_X]*HYPER[i].half_p[A_X]+HYPER[i].half_p[A_Y]*HYPER[i].half_p[A_Y]+HYPER[i].half_p[A_Z]*HYPER[i].half_p[A_Z]);
 		if(h_min>PART[i].r[A_Z])	h_min=PART[i].r[A_Z];
 		if(h_max<PART[i].r[A_Z])	h_max=PART[i].r[A_Z];
 	}
 	
-	lam<<sum_lam<<endl;
-	j<<sum_j<<endl;
+	lam<<sum_lam/h_num<<endl;
+	j<<sum_j/h_num<<endl;
 	p<<endl;
 	if(t==1)
 	{
 		p_an<<"p_sum,d_p_sum,h_p_sum\n";
 		h<<"h_min,h_max\n";
 	}
-	p_an<<p_sum<<","<<d_p_sum<<","<<h_p_sum<<endl;
+	p_an<<p_sum/h_num<<","<<d_p_sum/h_num<<","<<h_p_sum/h_num<<endl;
 	h<<h_min<<","<<h_max<<endl;
 
 	lam.close();
@@ -2780,11 +2775,11 @@ void output_newton_data1(double *fx, double *DfDx, double *n_rx, double *n_ry, d
 	for(int i=0;i<h_num;i++)
 	{
 		r<<n_rx[i]<<","<<n_ry[i]<<","<<n_rz[i]<<endl;
-		sum_fx+=fx[i]/h_num;
+		sum_fx+=fx[i];
 		//for(int j=0;j<h_num;j++) Df<<DfDx[i*h_num+j]<<",";
 		//Df<<endl;
 	}
-	sfx<<count<<","<<sum_fx<<endl;
+	sfx<<count<<","<<sum_fx/h_num<<endl;
 
 	r.close();
 	sfx.close();
@@ -2799,7 +2794,7 @@ void output_newton_data2(double E, double *XX, int hyper_number, int count, int 
 	ss_E<<"./Newton_raphson/E"<<t<<".csv";
 	
 	stringstream ss_lam;
-	ss_lam<<"./Newton_raphson/ave_lambda"<<t<<".csv";
+	ss_lam<<"./Newton_raphson/lambda"<<t<<".csv";
 		
 	if(count==1)
 	{
@@ -2824,8 +2819,13 @@ void output_newton_data2(double E, double *XX, int hyper_number, int count, int 
 	e<<count<<","<<E<<endl;
 
 	double sum_lam=0;
-	for(int i=0;i<h_num;i++)	sum_lam+=XX[i]/h_num;
-	lam<<count<<","<<sum_lam<<endl;
+	lam<<count<<",";
+	for(int i=0;i<h_num;i++)
+	{
+		lam<<XX[i]<<",";
+		sum_lam+=XX[i];
+	}
+	lam<<sum_lam/h_num<<endl;
 
 	e.close();
 	lam.close();
@@ -2885,7 +2885,10 @@ void output_newton2_data1(vector<hyperelastic>HYPER, double *fx, double *DfDx, i
 	ss_p<<"./Newton_raphson2/P"<<t<<".csv";
 	stringstream ss_fx;
 	ss_fx<<"./Newton_raphson2/ave_fx"<<t<<".csv";
-		
+	
+	stringstream ss_DfDx;
+	ss_DfDx<<"./Newton_raphson2/Dfdx_t"<<t<<"_count"<<count<<".csv";
+	
 	if(count==1)
 	{
 		ofstream init0(ss_p.str(), ios::trunc);
@@ -2897,6 +2900,7 @@ void output_newton2_data1(vector<hyperelastic>HYPER, double *fx, double *DfDx, i
 
 	ofstream fp(ss_p.str(), ios::app);
 	ofstream ffx(ss_fx.str(), ios::app);
+	ofstream fDfDx(ss_DfDx.str(),ios::trunc);
 
 	if(count==1)
 	{
@@ -2906,6 +2910,7 @@ void output_newton2_data1(vector<hyperelastic>HYPER, double *fx, double *DfDx, i
 	fp<<","<<count;	
 	int n=0;
 	double sum_fx=0;
+	ffx<<","<<count<<",";
 	for(int i=0;i<h_num;i++)
 	{
 		if(n==0)	fp<<","<<HYPER[i].p[A_X]<<","<<HYPER[i].p[A_Y]<<","<<HYPER[i].p[A_Z]<<endl;
@@ -2913,13 +2918,17 @@ void output_newton2_data1(vector<hyperelastic>HYPER, double *fx, double *DfDx, i
 		{
 			fp<<","<<","<<HYPER[i].p[A_X]<<","<<HYPER[i].p[A_Y]<<","<<HYPER[i].p[A_Z]<<endl;
 		}
-		sum_fx+=fx[i]/h_num;
+		for(int j=0;j<h_num;j++)	fDfDx<<DfDx[i*h_num+j]<<",";
+		fDfDx<<endl;
+		ffx<<fx[i]<<",";
+		sum_fx+=fx[i];
 		n++;
 	}
-	ffx<<","<<count<<","<<sum_fx<<endl;
+	ffx<<sum_fx/h_num<<","<<h_num<<endl;
 
 	fp.close();
 	ffx.close();
+	fDfDx.close();
 }
 
 void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> HYPER,int t)
