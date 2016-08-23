@@ -141,7 +141,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 			for(int i=0;i<h_num;i++)	
 			{
 				fs0<<HYPER[i].lambda<<",";
-				fs<<i<<","<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<0<<","<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<endl;
+				fs<<i<<","<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<old_r_z[i]<<","<<PART[i].r[A_X]<<","<<PART[i].r[A_Y]<<","<<PART[i].r[A_Z]<<endl;
 				fs3<<i<<","<<HYPER[i].half_p[A_X]<<","<<HYPER[i].half_p[A_Y]<<","<<old_hpz[i]<<","<<HYPER[i].half_p[A_X]<<","<<HYPER[i].half_p[A_Y]<<","<<HYPER[i].half_p[A_Z]<<endl;
 				fs5<<i<<","<<HYPER[i].p[A_X]<<","<<HYPER[i].p[A_Y]<<","<<HYPER[i].p[A_Z]<<endl;
 			}
@@ -310,6 +310,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 	
 	}
 	
+		calc_half_p(CON,PART,HYPER,HYPER1,1,F);
 
 	//	for(int i=0;i<p_num;i++)	cout<<"renew_p_x"<<i<<"="<<HYPER[i].p[A_X]<<endl;
 	cout<<"Hypercalculation ends."<<endl;
