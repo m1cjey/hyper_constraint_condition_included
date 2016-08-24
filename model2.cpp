@@ -1157,7 +1157,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 	 else if(model==21)	//越塚先生先行研究の角柱
 	 {
 		 double height=9;//4
-		 double base=18;//48
+		 double base=9;//48
 
 		 for(int i=0;i<base;i++)
 		 {
