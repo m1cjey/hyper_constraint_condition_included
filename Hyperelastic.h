@@ -26,6 +26,7 @@ public:
 	double Fi[DIMENSION][DIMENSION];
 	double vis_force[DIMENSION];
 	double vec_norm[DIMENSION];
+	double Fw[DIMENSION];
 	hyperelastic();
 };
 
