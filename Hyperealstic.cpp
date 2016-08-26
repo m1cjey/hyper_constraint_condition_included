@@ -2137,7 +2137,6 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 		{
 			Nr[i]=0;
 			for(int j=0;j<Nw;j++)	Nl[i*Nw+j]=0;
-			Nr[i]=-1*(PART[i].r[A_Z]);
 			cout<<"Nr"<<i<<"="<<Nr[i]<<endl;
 		}
 
@@ -2227,7 +2226,9 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 		for(int i=0;i<Nw;i++)
 		{
 			int iw=Nw_n[i];
-		
+			
+			Nr[i]=V*J[iw];
+	
 			int Ni=HYPER[iw].N;
 			for(int j=0;j<Ni;j++)
 			{			
