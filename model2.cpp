@@ -1165,11 +1165,29 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			 {
 				 for(int k=0;k<height;k++)
 				 {
-					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+0.01)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
+					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+1)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
 					 number++;
 				 }
 			 }
 		 }
+		 
+		 int number2=0;
+		 double w_b=25;
+		 double w_h=3;
+		 double le2=le*0.5;
+
+		 for(int i=0;i<w_b;i++)
+		 {
+			 for(int j=0;j<w_b;j++)
+			 {
+				 for(int k=0;k<w_h;k++)
+				 {
+					 writedata2(fq,number+number2,(i-(w_b-1)/2)*le2,(j-(w_b-1)/2)*le2,(k-w_h)*le2,WALL,0,ON,0,0,0,0,0,0,0,0,0,1);
+					 number2++;
+				 }
+			 }
+		 }
+		 number+=number2;
 		 cout<<"model完成\n";
 	
 /*		 double w_base=6;

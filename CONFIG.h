@@ -303,6 +303,7 @@ class mpsconfig
 	double c10;
 	double r_z_wall;
 	double h_dis;
+	double h_dis_w;
 	double h_vis;
 	int tension_test;	//ˆø‚Á’£‚èŒ±‰ğÍ—p15/2/8
 	int nr_time;
@@ -600,6 +601,7 @@ public:
 	double get_c10(){return c10;}
 	double get_c01(){return c01;}
 	double get_h_dis(){return h_dis;}
+	double get_h_dis_w(){return h_dis_w;}
 	double get_h_viscousity(){return h_vis;}
 	int get_nr(){return nr_time;}
 };
