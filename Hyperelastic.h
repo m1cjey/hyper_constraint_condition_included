@@ -12,7 +12,7 @@ public:
 	int flag_wall;
 
 	double lambda;
-	double lam_w;
+	double lamw;
 	double half_p[DIMENSION];
 	double stress[DIMENSION][DIMENSION];
 	double differential_p[DIMENSION];
@@ -37,7 +37,7 @@ public:
 	unsigned ID;
 	double wiin;
 	double DgDq[DIMENSION];
-	double DgDq_w[DIMENSION];
+	double DgDqw[DIMENSION];
 	double aiin[DIMENSION];
 	double n0ij[DIMENSION];
 	double spl_f;

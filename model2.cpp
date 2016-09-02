@@ -1165,14 +1165,14 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			 {
 				 for(int k=0;k<height;k++)
 				 {
-					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+1)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
+					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+1.0)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
 					 number++;
 				 }
 			 }
 		 }
 		 
 		 int number2=0;
-		 double w_b=25;
+		 double w_b=27;
 		 double w_h=3;
 		 double le2=le*0.5;
 
