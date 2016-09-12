@@ -596,6 +596,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 	}
 	///////////////////////////モデル　11　ミッキー//////////////////////
 	else if(model==11){
+
 		double ear_R=CON->get_R1()/2; //耳の半径
 		double spac=CON->get_R1()*2;	//耳同士の間隔
 		double ear_hi=CON->get_R1(); //耳の高さ
@@ -682,6 +683,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			}
 			
 			number=num;//*/
+	
 			cout<<"床の作成"<<endl;
 			//下壁
 			double Wr=20*le;//壁の半径
@@ -1797,6 +1799,28 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 		cout<<"壁完成\n";*/
 		cout<<"model完成\n";
 	}
+
+	else if(model==31)
+	{
+		double face_R=CON->get_R1(); //顔の半径
+
+		int num=0;	//粒子数
+		//外枠作成
+		set_circle_edge(X,Y,Z,&number,le,face_R);//円外周
+		//set_circle_in(X,Y,Z,type1,&number,le,R,0,number);////円内部  vector配列は参照渡ししている
+		set_circle_in_using_6_pieces(X,Y,Z,&number,le,face_R,0,number);//円内部    vector配列は参照渡ししている.
+
+		//球作成
+		set_sphere(X,Y,Z,&number,le,face_R,FULL);
+
+		//出力
+		for(int i=0;i<number;i++){
+			writedata2(fq,i,X[i],Y[i],Z[i]-CON->get_R1(),HYPERELAST,1, 0,0, 0, 0, 0,0,0,0, 0, 0,1);
+		}
+		cout<<"model完成"<<endl;
+	}
+
+
 	//////////////////////////////////////////////例外処理///////////////////////////////////////
 	else cout<<"modelエラー"<<endl;
 	////////////////////////////////////////////////////////////////////////////////////////////////

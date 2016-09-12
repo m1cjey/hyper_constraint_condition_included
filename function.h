@@ -219,3 +219,4 @@ void force_movie_AVS(mpsconfig *CON,int t,vector<mpselastic> &PART,int particle_
 //磁気モーメント法
 void Magnetic_Moment_Method(mpsconfig &CON,vector<mpselastic>&PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);
 void Magnetic_Moment_Methodv2(mpsconfig &CON,vector<mpselastic> &PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);
+void Magnetic_Moment_Methodv2_mag2(mpsconfig &CON,vector<mpselastic> &PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);

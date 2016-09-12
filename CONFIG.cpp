@@ -19,8 +19,8 @@ mpsconfig::mpsconfig()
 	ss>>step;
 	fin.close();*/
 	
-	step=10000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
-	switch_FEM=false;		//FEMを実行するかしないか false
+	step=100000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
+	switch_FEM=true;		//FEMを実行するかしないか false
 	nonlinear_elastic=false;	//弾性体非線形計算するかtrue
 	switch_vis=OFF;			//粘性項計算するかしないか・・・これはあとで消す
 	FEMCG=2;				//FEMにおける行列解法 0:CG 1:ICCG 2:並列ICCG 3:MRTR 4:ICMRTR
@@ -42,18 +42,9 @@ mpsconfig::mpsconfig()
 	ave_P_for_FEM_flag=8000000000;//80.0;//75.0;//70.0;
 
 //モデル
-	model_number=21;			//4:引っ張り試験片 7:MREアクチュエータ 12:剛体
+	model_number=31;			//4:引っ張り試験片 7:MREアクチュエータ 12:剛体
 	model_set_way=1;		//modelをセットする方法　0=正方格子 1=MD
 
-//モデル１,11専用
-/*	R1=9*0.001;
-	avoid_step=0;
-	avoid_step2=2425;
-	avoid_step3=2435;
-	avoid_step4=2445;
-	avoid_step5=5935;
-	avoid_step6=8410;
-	avoid_step7=10710;*/
 
 //出力動画
 	flag_cut_x_movie=ON;
@@ -65,10 +56,10 @@ mpsconfig::mpsconfig()
 	EM_calc_type=2;			//0=デローニのみ 1=電場 2=静磁場 3=動磁場 4=磁位
 //	EM_interval=1;//1		//電磁場計算を何ステップに一回行うか。通常は1に設定
 	//解析領域
-	XR=1.5;
-	XL=-1.5;
-	YU=1.5;
-	YD=-1.5;
+	XR=0.5;
+	XL=-0.5;
+	YU=0.5;
+	YD=-0.5;
 	/*
 	XR=0.1;//0.01;		
 	XL=-0.1;//-0.01;
@@ -80,9 +71,9 @@ mpsconfig::mpsconfig()
 	RU=distancebp*10;*/
 	
 	//FRMcheck用	15/2/10
-	ZU=1.5;//0.10; //0.2
-	ZD=-1.5;//0.10; //0.2 				//液滴 -0.01 コイル:-0.15 るつぼ:-0.0002
-	RU=1.5;//0.10;//0.1;				//解析領域が円筒形となるときのその半径
+	ZU=0.5;//0.10; //0.2
+	ZD=-0.5;//0.10; //0.2 				//液滴 -0.01 コイル:-0.15 るつぼ:-0.0002
+	RU=0.5;//0.10;//0.1;				//解析領域が円筒形となるときのその半径
 
 //流体の物性値
 	MRE_density=1826;          //water:997.04  エタノール:798[kg/m3]
@@ -107,17 +98,17 @@ mpsconfig::mpsconfig()
 	///////////////////
 //粒子配置用
 	fluidwidth=21; //30;//40//15[個]	//fluidwidth=20*2;
-	distancebp=0.1;///0.001/2;//0.005; //distancebp=0.0125;[mm]
+	distancebp=0.01;///0.001/2;//0.005; //distancebp=0.0125;[mm]
 	wlength=2;
 	height=0.0;//0.005;    
 
 //解析領域
-	maxX=1.5;//0.1;	//0.1/2;	//1
-	minX=-1.5;//-0.1;	//-0.1/2;
-	maxY=1.5;//0.1;	//0.1/2;	//0.4;
-	minY=-1.5;//-0.1;	//-0.1/2;	//-0.6; //-1.0
-	maxZ=1.5;//0.1;	//0.1/2;	//0.3;
-	minZ=-1.5;//-0.1;	//-0.1/2;	//-0.6;  //indexの関係上、Z方向には余裕をもつこと。
+	maxX=0.5;//0.1;	//0.1/2;	//1
+	minX=-0.5;//-0.1;	//-0.1/2;
+	maxY=0.5;//0.1;	//0.1/2;	//0.4;
+	minY=-0.5;//-0.1;	//-0.1/2;	//-0.6; //-1.0
+	maxZ=0.5;//0.1;	//0.1/2;	//0.3;
+	minZ=-0.5;//-0.1;	//-0.1/2;	//-0.6;  //indexの関係上、Z方向には余裕をもつこと。
 
 	//FEMcheck用15/2/10
 /*	maxX=0.2;	//0.1/2;	//
@@ -322,20 +313,29 @@ mpsconfig::mpsconfig()
 	max_pressure=10000;
 	min_pressure=0;
 
+//モデル１,11専用
+	R1=6*distancebp;
+/*	avoid_step=0;
+	avoid_step2=2425;
+	avoid_step3=2435;
+	avoid_step4=2445;
+	avoid_step5=5935;
+	avoid_step6=8410;
+	avoid_step7=10710;*/
 
 //超弾性計算 
 	flag_ELAST=OFF;
 	flag_HYPER=ON;
 	flag_GRAVITY=OFF;
 	hyper_density=2970;          //water:997.04  エタノール:798[kg/m3]
-	c10=30000;//30000;
-	c01=20000;//20000;
-	h_dis=3.8*distancebp;
+	c10=30;//30000;
+	c01=20;//20000;
+	h_dis=1.9*distancebp;
 	h_dis_w=0.5*distancebp;
 	h_vis=1;
-	flag_vis=OFF;
+	flag_vis=ON;
 	nr_time=5000;	//15/2/8
-	flag_wall=ON;
+	flag_wall=OFF;
 }
 
 
