@@ -1815,7 +1815,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 
 		//出力
 		for(int i=0;i<number;i++){
-			writedata2(fq,i,X[i],Y[i],Z[i]-CON->get_R1(),HYPERELAST,1, 0,0, 0, 0, 0,0,0,0, 0, 0,1);
+			writedata2(fq,i,X[i],Y[i],Z[i],HYPERELAST,1, 0,0, 0, 0, 0,0,0,0, 0, 0,1);
 		}
 		cout<<"model完成"<<endl;
 	}
