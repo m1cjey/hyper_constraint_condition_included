@@ -1821,6 +1821,35 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 	}
 
 
+	//////////////////////////////////////////////////////加嶋さんの円筒モデル/////////////////////////////////////////////////////////////////////
+	else if(model==32)	
+	{
+		double R=CON->get_R1();//半径
+		double height=5*le;//(6*le*A)*2;これは何？
+
+		//円作成
+		int circle_start_id=0; 
+		set_circle_edge(X,Z,Y,&number,le,R);//円外周　これがないと内部も作れない
+		set_circle_in_using_6_pieces(X,Z,Y,&number,le,R,0,number);//円内部    vector配列は参照渡ししている
+//			set_circle_edge(X,Y,Z,&number,le,R, height);//円外周　これがないと内部も作れない
+//			set_circle_in_using_6_pieces(X,Y,Z,&number,le,R,height,0,number);//円内部    vector配列は参照渡ししている
+		int circle_end_id=number;	//円の粒子idを記憶
+		////////
+
+		int top_flag=ON;		//円柱の上面も作成するからフラグをON
+		set_cylinder_face(X,Z,Y,&number,le,R,height,circle_start_id,circle_end_id,top_flag);//円柱表面座標作成
+		int face_n=number; //
+		///////
+		for(int s=0;s<face_n;s++)	writedata2(fq,s,X[s],Y[s],Z[s]+R+le,HYPERELAST,1,1,0,0,0,0,0,0,0,0,0,1);//粒子は,FACE
+		///////////////////////////////////////////////////////////////////////////////
+		set_cylinder_in(X,Z,Y,&number,le,R,height,1,circle_start_id);//内部にパッキング
+
+		int beforeNumber=number;
+			
+		//円柱表面+下壁の書き込み
+		for(int i=face_n;i<number;i++) writedata2(fq,i,X[i],Y[i],Z[i]+R+le,HYPERELAST,1,0,0,0,0,0,0,0,0,0,0,1);
+	}
+
 	//////////////////////////////////////////////例外処理///////////////////////////////////////
 	else cout<<"modelエラー"<<endl;
 	////////////////////////////////////////////////////////////////////////////////////////////////

@@ -275,7 +275,7 @@ _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHE
 				}	
 			}
 			}
-			else if(CON.get_EM_method()==3) Magnetic_Moment_Methodv2_mag2(CON,PART,F, n0, lambda,hyper_number, particle_number, TIME, t);			//Magnetic_Moment_Methodv2(CON,PART,F, n0, lambda,hyper_number, particle_number, TIME, t);		
+			else if(CON.get_EM_method()==3) Magnetic_Moment_Methodv2(CON,PART,F, n0, lambda,hyper_number, particle_number, TIME, t);			//Magnetic_Moment_Methodv2(CON,PART,F, n0, lambda,hyper_number, particle_number, TIME, t);		
 		}
 		cout<<"Ž¥ê‰ðÍI—¹"<<endl;
 

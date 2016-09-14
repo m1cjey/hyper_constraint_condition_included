@@ -1533,15 +1533,15 @@ void Magnetic_Moment_Methodv2(mpsconfig &CON,vector<mpselastic> &PART,double **F
 	double mt = 1;                                //流体に対す磁性体の占める体積によって変化させる
 	double ratio;
 	//double mag_center[3]={0,0,-2.1e-05};
-	double mag_center_Z_init =-0.006; //磁石の重心の初期地
-	double mag_center_Z_goal =-0.006; //磁石の重心の目標地．初期地と同じにすれば動かない．
+	double mag_center_Z_init =-0.0025-0.004; //磁石の重心の初期地
+	double mag_center_Z_goal =-0.0025-0.004; //磁石の重心の目標地．初期地と同じにすれば動かない．
 	double mag_center_dx = 0.2;        //磁石の移動速度(m/s)
 	double mag_center_Z_curr = mag_center_Z_init + current_time * mag_center_dx;         //磁石の現在地の更新
-	double mag_M[3] = {0,0,0.1};    //[T](交流の場合は振幅)
+	double mag_M[3] = {0,0,0.5};    //[T](交流の場合は振幅)
 	
 	
 	int mesh_size;
-	double size[3] = {0.005, 0.005, 0.005};	//各辺の半分の寸法
+	double size[3] = {0.005, 0.005, 0.0025};	//各辺の半分の寸法
 
 	
 	/*//------交流磁場

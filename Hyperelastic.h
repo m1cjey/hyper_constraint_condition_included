@@ -11,6 +11,7 @@ public:
 	double pnd0;
 	int flag_wall;
 
+	double dec_ET;
 	double lambda;
 	double lam_w;
 	double half_p[DIMENSION];
