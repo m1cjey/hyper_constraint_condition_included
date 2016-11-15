@@ -73,27 +73,17 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 		output_energy(CON,PART,HYPER,t);
 	}
 
-	int f_wall=CON.get_flag_wall();
-
-	//•ÇŒvŽZ–³
-	if(f_wall==OFF)
-	{
-		newton_raphson(CON,PART,HYPER,HYPER1,t,F);
-		calc_half_p(CON,PART,HYPER,HYPER1,0,F);
-		calc_F(CON,PART,HYPER,HYPER1);
-		calc_stress(CON,HYPER);
-		calc_differential_p(CON,PART,HYPER,HYPER1,F);
-		renew_lambda(CON,PART,HYPER,HYPER1,t);
-		calc_half_p(CON,PART,HYPER,HYPER1,1,F);
-	}
-	//•ÇŒvŽZ—L
-	else
-	{
-
-		calc_half_p(CON,PART,HYPER,HYPER1,1,F);
-	}
 	
-	//	for(int i=0;i<p_num;i++)	cout<<"renew_p_x"<<i<<"="<<HYPER[i].p[A_X]<<endl;
+	newton_raphson(CON,PART,HYPER,HYPER1,t,F);
+	calc_half_p(CON,PART,HYPER,HYPER1,0,F);
+	calc_F(CON,PART,HYPER,HYPER1);
+	calc_stress(CON,HYPER);
+	calc_differential_p(CON,PART,HYPER,HYPER1,F);
+	renew_lambda(CON,PART,HYPER,HYPER1,t);
+	calc_half_p(CON,PART,HYPER,HYPER1,1,F);
+	
+
+	//for(int i=0;i<p_num;i++)	cout<<"renew_p_x"<<i<<"="<<HYPER[i].p[A_X]<<endl;
 	cout<<"Hypercalculation ends."<<endl;
 
 	clock_t end_t=clock();
@@ -3551,4 +3541,5 @@ void GaussSeidelvh(double *A, int pn, double *b,double ep)
 		b[i] = x[i];
 	}
 }
+
 
