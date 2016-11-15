@@ -1158,8 +1158,8 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 	 ///////////////////////////////////////////モデル21　超弾性体///////////////////////////////////////////////////////////
 	 else if(model==21)	//越塚先生先行研究の角柱
 	 {
-		 double height=9;//4
-		 double base=9;//48
+		 double height=6;//4
+		 double base=6;//48
 
 		 for(int i=0;i<base;i++)
 		 {
@@ -1167,13 +1167,13 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 			 {
 				 for(int k=0;k<height;k++)
 				 {
-					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+1.0)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
+					 writedata2(fq,number,(i-(base-1)/2)*le,(j-(base-1)/2)*le,(k+0.01)*le,HYPERELAST,1,ON,0,0,0,0,0,0,0,0,0,1);
 					 number++;
 				 }
 			 }
 		 }
 		 
-		 int number2=0;
+/*		 int number2=0;
 		 double w_b=27;
 		 double w_h=3;
 		 double le2=le*0.5;
@@ -1189,7 +1189,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 				 }
 			 }
 		 }
-		 number+=number2;
+		 number+=number2;*/
 		 cout<<"model完成\n";
 	
 /*		 double w_base=6;
@@ -1256,7 +1256,7 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 		 cout<<"壁完成\n";*/
 	 }
 
-	 ///////////////////////////////////////
+	 /////////////////////////////////////////////////////////////////////////////
 	 else if(model==22)	//越塚先生先行研究の円筒型
 	 {
 		 double height=3;
@@ -1840,14 +1840,14 @@ void set_initial_placement_using_MD(mpsconfig *CON,int *particle_number)
 		set_cylinder_face(X,Z,Y,&number,le,R,height,circle_start_id,circle_end_id,top_flag);//円柱表面座標作成
 		int face_n=number; //
 		///////
-		for(int s=0;s<face_n;s++)	writedata2(fq,s,X[s],Y[s],Z[s]+R+le,HYPERELAST,1,1,0,0,0,0,0,0,0,0,0,1);//粒子は,FACE
+		for(int s=0;s<face_n;s++)	writedata2(fq,s,X[s],Y[s],Z[s]+R+0.005*le,HYPERELAST,1,0,0,0,0,0,0,0,0,0,0,1);//粒子は,FACE
 		///////////////////////////////////////////////////////////////////////////////
 		set_cylinder_in(X,Z,Y,&number,le,R,height,1,circle_start_id);//内部にパッキング
 
 		int beforeNumber=number;
 			
 		//円柱表面+下壁の書き込み
-		for(int i=face_n;i<number;i++) writedata2(fq,i,X[i],Y[i],Z[i]+R+le,HYPERELAST,1,0,0,0,0,0,0,0,0,0,0,1);
+		for(int i=face_n;i<number;i++)	writedata2(fq,i,X[i],Y[i],Z[i]+R+0.005*le,HYPERELAST,1,0,0,0,0,0,0,0,0,0,0,1);
 	}
 
 	//////////////////////////////////////////////例外処理///////////////////////////////////////

@@ -2743,6 +2743,7 @@ void file_initialization()
 	ofstream init29("Convergence_rate.csv", ios::trunc);
 	ofstream init30("Newton_Convergence_rate.csv", ios::trunc);
 	ofstream init32("model_height.csv", ios::trunc);
+	ofstream init33("r_CG.csv", ios::trunc);
 	system("mkdir Newton_raphson");
 	system("mkdir Viscosity");
 
@@ -2776,6 +2777,7 @@ void file_initialization()
 	init30.close();
 	init31.close();
 	init32.close();
+	init33.close();
 }
 
 void Make_STL(){

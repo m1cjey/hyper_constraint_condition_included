@@ -19,14 +19,14 @@ mpsconfig::mpsconfig()
 	ss>>step;
 	fin.close();*/
 	
-	step=100000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
+	step=10000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
 	switch_FEM=false;		//FEMを実行するかしないか false
 	nonlinear_elastic=false;	//弾性体非線形計算するかtrue
 	switch_vis=OFF;			//粘性項計算するかしないか・・・これはあとで消す
 	FEMCG=2;				//FEMにおける行列解法 0:CG 1:ICCG 2:並列ICCG 3:MRTR 4:ICMRTR
 
 //	dt= (switch_FEM==OFF) ? 1.0e-5: 5.0e-6; //0.0001;不安定要因！ 0.00001:推奨(Courant数考えて) //Cf. dt_for_FEM=0.000001/2;
-	dt=1e-5;
+	dt=1e-4;//1e-5;
 	dt_for_FEM=5.0e-6;
 	//FEMだと0.000001で止まる・・・
 	current_step=2;
@@ -42,13 +42,13 @@ mpsconfig::mpsconfig()
 	ave_P_for_FEM_flag=8000000000;//80.0;//75.0;//70.0;
 
 //モデル
-	model_number=32;			//4:引っ張り試験片 7:MREアクチュエータ 12:剛体
+	model_number=21;			//4:引っ張り試験片 7:MREアクチュエータ 12:剛体
 	model_set_way=1;		//modelをセットする方法　0=正方格子 1=MD
 
 
 //出力動画
-	flag_cut_x_movie=ON;
-	flag_cut_y_movie=ON;
+	flag_cut_x_movie=OFF;
+	flag_cut_y_movie=OFF;
 
 //電磁力計算
 	region_shape=1;//1;		//解析領域形状　0=立方体 1=円筒
@@ -56,10 +56,10 @@ mpsconfig::mpsconfig()
 	EM_calc_type=2;			//0=デローニのみ 1=電場 2=静磁場 3=動磁場 4=磁位
 //	EM_interval=1;//1		//電磁場計算を何ステップに一回行うか。通常は1に設定
 	//解析領域
-	XR=0.1;
-	XL=-0.1;
-	YU=0.1;
-	YD=-0.1;
+	XR=2.5;//0.25;
+	XL=-2.5;//-0.25;
+	YU=2.5;//0.25;
+	YD=-2.5;//0.25;
 	/*
 	XR=0.1;//0.01;		
 	XL=-0.1;//-0.01;
@@ -71,15 +71,15 @@ mpsconfig::mpsconfig()
 	RU=distancebp*10;*/
 	
 	//FRMcheck用	15/2/10
-	ZU=0.1;//0.10; //0.2
-	ZD=-0.1;//0.10; //0.2 				//液滴 -0.01 コイル:-0.15 るつぼ:-0.0002
-	RU=0.1;//0.10;//0.1;				//解析領域が円筒形となるときのその半径
+	ZU=2.5;//0.25;//0.10; //0.2
+	ZD=-2.5;//0.25;//0.10; //0.2 				//液滴 -0.01 コイル:-0.15 るつぼ:-0.0002
+	RU=2.5;//0.25;//0.10;//0.1;				//解析領域が円筒形となるときのその半径
 
 //流体の物性値
 	MRE_density=1826;          //water:997.04  エタノール:798[kg/m3]
 	Silicone_density=980;
 	flag_modify_density=OFF;	//密度補償するかどうか
-	nensei=1.00; //[Pa・s]//water:0.001 エタノール:0.001084 nensei 8.0
+	nensei=100.00; //[Pa・s]//water:0.001 エタノール:0.001084 nensei 8.0
 	sigma=0.07196;			//water:0.07196 エタノール:0.02361 SUS404:1.85 表面張力係数
 	Cp=640/10;     			//water:4.2[kJ/(kg・K)] 鋼:800J SUS404:645J/(kgK)　
 	k=28;       			//water:0.6[W/(m・K)] //熱伝導率
@@ -98,17 +98,17 @@ mpsconfig::mpsconfig()
 	///////////////////
 //粒子配置用
 	fluidwidth=21; //30;//40//15[個]	//fluidwidth=20*2;
-	distancebp=0.005;///0.001/2;//0.005; //distancebp=0.0125;[mm]
+	distancebp=0.1;//0.005;///0.001/2;//0.005; //distancebp=0.0125;[mm]
 	wlength=2;
 	height=0.0;//0.005;    
 
 //解析領域
-	maxX=0.1;//0.1;	//0.1/2;	//1
-	minX=-0.1;//-0.1;	//-0.1/2;
-	maxY=0.1;//0.1;	//0.1/2;	//0.4;
-	minY=-0.1;//-0.1;	//-0.1/2;	//-0.6; //-1.0
-	maxZ=0.1;//0.1;	//0.1/2;	//0.3;
-	minZ=-0.1;//-0.1;	//-0.1/2;	//-0.6;  //indexの関係上、Z方向には余裕をもつこと。
+	maxX=2.5;//0.25;//0.1;	//0.1/2;	//1
+	minX=-2.5;//0.25;//-0.1;	//-0.1/2;
+	maxY=2.5;//0.25;//0.1;	//0.1/2;	//0.4;
+	minY=-2.5;//0.25;//-0.1;	//-0.1/2;	//-0.6; //-1.0
+	maxZ=2.5;//0.25;//0.1;	//0.1/2;	//0.3;
+	minZ=-2.5;//0.25;//-0.1;	//-0.1/2;	//-0.6;  //indexの関係上、Z方向には余裕をもつこと。
 
 	//FEMcheck用15/2/10
 /*	maxX=0.2;	//0.1/2;	//
@@ -326,14 +326,14 @@ mpsconfig::mpsconfig()
 //超弾性計算 
 	flag_ELAST=OFF;
 	flag_HYPER=ON;
-	flag_GRAVITY=ON;
-	hyper_density=2970;          //water:997.04  エタノール:798[kg/m3]
+	flag_GRAVITY=OFF;
+	hyper_density=1000;//2970;          //water:997.04  エタノール:798[kg/m3]
 	c10=30000;//30000;
 	c01=20000;//20000;
 	h_dis=1.9*distancebp;
 	h_dis_w=0.5*distancebp;
-	h_vis=1;
-	flag_vis=ON;
+	//h_vis=100;
+	flag_vis=OFF;
 	nr_time=5000;	//15/2/8
 	flag_wall=ON;
 }
