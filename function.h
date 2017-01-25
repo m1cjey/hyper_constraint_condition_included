@@ -141,7 +141,7 @@ void move_particle(mpsconfig *CON,vector<mpselastic> &PART,int particle_number,i
 
 //非対称行列解法
 void BiCGStab_method(mpsconfig *CON,double *r,int pn,double *X,int *countN,double EP,double **A);
-//void BiCGStab2_method(mpsconfig *CON,double *r,int pn,double *X,int *countN,double EP,double **A);
+void BiCGStab2_method(mpsconfig *CON,double *r,int pn,double *X,int *countN,double EP,double **A);
 
 //高レベル関数
 double get_Legendre(int l,int m,double x);
@@ -210,7 +210,7 @@ void calc_hyper(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HY
 
 
 //粘性項計算
-void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,int t);
+void calc_vis_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic>&HYPER,vector<hyperelastic2>HYPER1,int rigid_number,int t);
 void calc_spl_f(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelastic2>&HYPER1,int hyper_number);
 
 //応力出力関数
@@ -218,6 +218,4 @@ void force_movie_AVS(mpsconfig *CON,int t,vector<mpselastic> &PART,int particle_
 
 //磁気モーメント法
 void Magnetic_Moment_Method(mpsconfig &CON,vector<mpselastic>&PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);
-void Magnetic_Moment_Methodv2(mpsconfig &CON,vector<mpselastic> &PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);
-void Magnetic_Moment_Methodv2_mag2(mpsconfig &CON,vector<mpselastic> &PART,double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);
-
+void Magnetic_Moment_Methodv2(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &HYPER, double **F,double n0,double lamda,int fluid_number,int particle_number, double current_time, int t);

@@ -15,19 +15,19 @@ mpsconfig::mpsconfig()
 	//boost::formatで実装するのがラクでスマート・・・
 	//get_char()で実装して#(コメント文)を読み飛ばしても良い
 	getline(fin, buffer);
-	ss<<buffer
+	ss<<buffer;
 	ss>>step;
 	fin.close();*/
 	
-	step=10000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
-	switch_FEM=false;		//FEMを実行するかしないか false
+	step=1000000;				//全step数	step=20000;//40000;	//30000;//10000;;	//79*20+1;
+	switch_FEM=true;		//FEMを実行するかしないか false
 	nonlinear_elastic=false;	//弾性体非線形計算するかtrue
 	switch_vis=OFF;			//粘性項計算するかしないか・・・これはあとで消す
 	FEMCG=2;				//FEMにおける行列解法 0:CG 1:ICCG 2:並列ICCG 3:MRTR 4:ICMRTR
 
 //	dt= (switch_FEM==OFF) ? 1.0e-5: 5.0e-6; //0.0001;不安定要因！ 0.00001:推奨(Courant数考えて) //Cf. dt_for_FEM=0.000001/2;
-	dt=1e-4;//1e-5;
-	dt_for_FEM=5.0e-6;
+	dt=1.0e-5;
+	dt_for_FEM=1.0e-5;
 	//FEMだと0.000001で止まる・・・
 	current_step=2;
 	current_time=0.0;
@@ -42,9 +42,18 @@ mpsconfig::mpsconfig()
 	ave_P_for_FEM_flag=8000000000;//80.0;//75.0;//70.0;
 
 //モデル
-	model_number=21;			//4:引っ張り試験片 7:MREアクチュエータ 12:剛体
+	model_number=22;			//4:引っ張り試験片 7:MREアクチュエータ 12:剛体
 	model_set_way=1;		//modelをセットする方法　0=正方格子 1=MD
 
+//モデル１,11専用
+/*	R1=9*0.001;
+	avoid_step=0;
+	avoid_step2=2425;
+	avoid_step3=2435;
+	avoid_step4=2445;
+	avoid_step5=5935;
+	avoid_step6=8410;
+	avoid_step7=10710;*/
 
 //出力動画
 	flag_cut_x_movie=OFF;
@@ -56,10 +65,10 @@ mpsconfig::mpsconfig()
 	EM_calc_type=2;			//0=デローニのみ 1=電場 2=静磁場 3=動磁場 4=磁位
 //	EM_interval=1;//1		//電磁場計算を何ステップに一回行うか。通常は1に設定
 	//解析領域
-	XR=2.5;//0.25;
-	XL=-2.5;//-0.25;
-	YU=2.5;//0.25;
-	YD=-2.5;//0.25;
+	XR=0.2;
+	XL=-0.2;
+	YU=0.2;
+	YD=-0.2;
 	/*
 	XR=0.1;//0.01;		
 	XL=-0.1;//-0.01;
@@ -71,15 +80,15 @@ mpsconfig::mpsconfig()
 	RU=distancebp*10;*/
 	
 	//FRMcheck用	15/2/10
-	ZU=2.5;//0.25;//0.10; //0.2
-	ZD=-2.5;//0.25;//0.10; //0.2 				//液滴 -0.01 コイル:-0.15 るつぼ:-0.0002
-	RU=2.5;//0.25;//0.10;//0.1;				//解析領域が円筒形となるときのその半径
+	ZU=2.5;//0.10; //0.2
+	ZD=-2.5;//0.10; //0.2 				//液滴 -0.01 コイル:-0.15 るつぼ:-0.0002
+	RU=2.0;//0.10;//0.1;				//解析領域が円筒形となるときのその半径
 
 //流体の物性値
 	MRE_density=1826;          //water:997.04  エタノール:798[kg/m3]
 	Silicone_density=980;
 	flag_modify_density=OFF;	//密度補償するかどうか
-	nensei=100.00; //[Pa・s]//water:0.001 エタノール:0.001084 nensei 8.0
+	nensei=1.00; //[Pa・s]//water:0.001 エタノール:0.001084 nensei 8.0
 	sigma=0.07196;			//water:0.07196 エタノール:0.02361 SUS404:1.85 表面張力係数
 	Cp=640/10;     			//water:4.2[kJ/(kg・K)] 鋼:800J SUS404:645J/(kgK)　
 	k=28;       			//water:0.6[W/(m・K)] //熱伝導率
@@ -97,18 +106,18 @@ mpsconfig::mpsconfig()
 	v_e=0.28;
 	///////////////////
 //粒子配置用
-	fluidwidth=21; //30;//40//15[個]	//fluidwidth=20*2;
-	distancebp=0.1;//0.005;///0.001/2;//0.005; //distancebp=0.0125;[mm]
+	fluidwidth=20; //30;//40//15[個]	//fluidwidth=20*2;
+	distancebp=9.e-3/4.;	//2.5e-3;///0.001/2;//0.005; //distancebp=0.0125;[mm]
 	wlength=2;
 	height=0.0;//0.005;    
 
 //解析領域
-	maxX=2.5;//0.25;//0.1;	//0.1/2;	//1
-	minX=-2.5;//0.25;//-0.1;	//-0.1/2;
-	maxY=2.5;//0.25;//0.1;	//0.1/2;	//0.4;
-	minY=-2.5;//0.25;//-0.1;	//-0.1/2;	//-0.6; //-1.0
-	maxZ=2.5;//0.25;//0.1;	//0.1/2;	//0.3;
-	minZ=-2.5;//0.25;//-0.1;	//-0.1/2;	//-0.6;  //indexの関係上、Z方向には余裕をもつこと。
+	maxX=0.2;//0.1;	//0.1/2;	//1
+	minX=-0.2;//-0.1;	//-0.1/2;
+	maxY=0.2;//0.1;	//0.1/2;	//0.4;
+	minY=-0.2;//-0.1;	//-0.1/2;	//-0.6; //-1.0
+	maxZ=0.2;//0.1;	//0.1/2;	//0.3;
+	minZ=-0.2;//-0.1;	//-0.1/2;	//-0.6;  //indexの関係上、Z方向には余裕をもつこと。
 
 	//FEMcheck用15/2/10
 /*	maxX=0.2;	//0.1/2;	//
@@ -186,7 +195,7 @@ mpsconfig::mpsconfig()
 	air_layer=2;				//物体の周囲に空気層を生成する層数(0なら生成しない)
 	layer_depth=0.5;//0.5(2012/03/03);		//空気層の幅。初期粒子間距離の何倍か
 	mesh_output_interval=1;//1;	//メッシュ情報を、有限要素法のステップに対して、何ステップに一度出力するか。
-	FEMCGep=1.0e-30;			//1.3e-4PICCG 元々5.0e-6	//本プログラムでは現在不使用15/5/24
+	FEMCGep=5.0e-5;			//1.3e-4PICCG 元々5.0e-6	//本プログラムでは現在不使用15/5/24
 	MRTRep=6.8e-4;		//MRTR(&ICMRTR)法の収束判定	//本プログラムでは現在不使用15/5/24
 	FEM_calc_type=2;	//15/5/24	//3;		//0=OFF 1=電場 2=磁場 3=磁場(渦電流) 4=磁位 5=非線形静磁場
 	ele_type=1;				//(mesher=0の場合) 要素ﾀｲﾌﾟ 0:節点要素 1:辺要素
@@ -195,7 +204,7 @@ mpsconfig::mpsconfig()
 	J_input_way=0;			//電流密度入手方法 0:OFF 1:自分 2:ソフト
 	J0=0.0;//100;//180000000;		//強制電流密度[A/m2]
 	I0=450.0;//200; mA?
-	RP=2.0;//2//1.5;//1.28;	//比透磁率
+	RP=2.680487046;//;//2//1.5;//1.28;	//比透磁率
 	ele_conduc=1e7;			//電気伝導率
 	Hz=10;			//周波数
 	div_Hz=4;				//１周期の分割数(解析精度) 4の倍数がいい 40?
@@ -205,7 +214,7 @@ mpsconfig::mpsconfig()
 	NLMH=OFF;				//Ｍの算出に非線形性を考慮するか、しないか
 	magnet_H=1.62577821*distancebp;			//永久磁石の高さ0.005
 	magnet_r=1.62577821*distancebp;//0.01	//永久磁石の半径0.005 　　　　　　　　　　　//J_input_way=2:半径ではなく直径、J_put_way=0:半径　と思われる。
-	magnet_Z=-magnet_H-3*distancebp;//-8*distancebp; //-45*0.0005-0.005; //-(fluidwidth)*distancebp-0.01; //-0.0125*0.8		//永久磁石の中心のZ座標 42*0.0005 //-magnet_H/2-(15*distancebp+0.002) モデル5:-0.035
+	magnet_Z=-magnet_H-distancebp;//-8*distancebp; //-45*0.0005-0.005; //-(fluidwidth)*distancebp-0.01; //-0.0125*0.8		//永久磁石の中心のZ座標 42*0.0005 //-magnet_H/2-(15*distancebp+0.002) モデル5:-0.035
 	magnet_angle=0.0;			//永久磁石の着磁方向 0なら+Z方向となる。そこから角度をつけたいなら、その角度[deg]を入力する
 	magnet_B=0.5;//0.145;//1.20;			//永久磁石の強さ[T] Avector3D()で指定
 	magnetic_layers=1;	//永久磁石周辺の空気層の数1層はすでにある 1+
@@ -313,29 +322,19 @@ mpsconfig::mpsconfig()
 	max_pressure=10000;
 	min_pressure=0;
 
-//モデル１,11専用
-	R1=5*distancebp;
-/*	avoid_step=0;
-	avoid_step2=2425;
-	avoid_step3=2435;
-	avoid_step4=2445;
-	avoid_step5=5935;
-	avoid_step6=8410;
-	avoid_step7=10710;*/
 
 //超弾性計算 
 	flag_ELAST=OFF;
 	flag_HYPER=ON;
-	flag_GRAVITY=OFF;
-	hyper_density=1000;//2970;          //water:997.04  エタノール:798[kg/m3]
-	c10=30000;//30000;
+	flag_GRAVITY=ON;
+	hyper_density=1554.354;//2970;          //water:997.04  エタノール:798[kg/m3]
+	c10=4621.012789;	//30000;	//4621.012789;	//30000;//30000;
 	c01=20000;//20000;
+	flag_wall=OFF;
 	h_dis=1.9*distancebp;
-	h_dis_w=0.5*distancebp;
-	//h_vis=100;
+	h_vis=800*1.e6/hyper_density; //[Pa・s]//water:0.001 エタノール:0.001084 nensei 8.0
 	flag_vis=OFF;
-	nr_time=5000;	//15/2/8
-	flag_wall=ON;
+	nr_time=1000;	//15/2/8
 }
 
 
