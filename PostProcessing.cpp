@@ -11,92 +11,92 @@ void post_processing(mpsconfig &CON, vector<mpselastic> &PART, elastic &ELAST, i
 	//AVSに粒子データ出力
 	if(t==1 || t%CON.get_interval()==0) particle_movie_AVS(CON,PART,ELAST,fluid_number,particle_number,t,TIME);
 		cout<<"AVS出力完了"<<endl;
-		
-	//AVS2に磁束密度、ローレンツ力出力
-		//if((t==1 || t%CON.get_EM_interval()==0) && CON.get_FEM_flag()==ON) particle_movie_AVS2(CON,t,PART,TIME,fluid_number,particle_number,F);
-		cout<<"AVS2出力完了\n";
+	//	
+	////AVS2に磁束密度、ローレンツ力出力
+	//	if((t==1 || t%CON.get_EM_interval()==0) && CON.get_FEM_flag()==ON) particle_movie_AVS2(CON,t,PART,TIME,fluid_number,particle_number,F);
+	//	cout<<"AVS2出力完了\n";
 
-	//速度をプロット
-	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_speed(CON ,PART,particle_number,fluid_number);
-		cout<<"速度プロット完了"<<endl;
+	////速度をプロット
+	//if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_speed(CON ,PART,particle_number,fluid_number);
+	//	cout<<"速度プロット完了"<<endl;
 
-	//圧力による加速度をプロット
-	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_pressure_acceleration(CON, PART);
-		cout<<"加速度プロット完了"<<endl;
+	////圧力による加速度をプロット
+	//if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_pressure_acceleration(CON, PART);
+	//	cout<<"加速度プロット完了"<<endl;
 
-	//応力分布をプロット
-	if(CON.get_flag_ELAST()==ON)	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_stress_distribution(CON, PART);
-		cout<<"応力分布プロット完了"<<endl;
+	////応力分布をプロット
+	//if(CON.get_flag_ELAST()==ON)	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_stress_distribution(CON, PART);
+	//	cout<<"応力分布プロット完了"<<endl;
 
-	//せん断力をプロット
-	if(CON.get_flag_ELAST()==ON)	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_shear_force(CON, PART);
-		cout<<"せん断加速度プロット完了"<<endl;
+	////せん断力をプロット
+	//if(CON.get_flag_ELAST()==ON)	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_shear_force(CON, PART);
+	//	cout<<"せん断加速度プロット完了"<<endl;
 
-	//ひずみ速度による加速度をプロット
-	if(CON.get_flag_ELAST()==ON)	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_strainrate_acceleration(CON, PART);
-		cout<<"ひずみ加速度プロット完了"<<endl;
+	////ひずみ速度による加速度をプロット
+	//if(CON.get_flag_ELAST()==ON)	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_strainrate_acceleration(CON, PART);
+	//	cout<<"ひずみ加速度プロット完了"<<endl;
 
-	//ひずみ率をプロット
-	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_distortion_rate(CON, PART);
-		cout<<"ひずみ率プロット完了"<<endl;
+	////ひずみ率をプロット
+	//if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_distortion_rate(CON, PART);
+	//	cout<<"ひずみ率プロット完了"<<endl;
 
-	//残差加速度をプロット
-	if(CON.get_flag_ELAST()==ON)	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_residual_acceleration(CON, PART, F);
-		cout<<"残差加速度プロット完了"<<endl;
+	////残差加速度をプロット
+	//if(CON.get_flag_ELAST()==ON)	if(CON.get_current_step()==1 || CON.get_current_step()%CON.get_interval()==0) plot_residual_acceleration(CON, PART, F);
+	//	cout<<"残差加速度プロット完了"<<endl;
 
-	//座標プロット
-	ofstream gnu1("0.dat");//解析終了後の全粒子座標をプロット
-	ofstream gnu2("suf.dat");//表面粒子だけをプロット
-	
-	if(CON.get_dimension()==2)
-	{
-		for(int i=0;i<particle_number;i++)
-		{ 
-			gnu1<<PART[i].r[A_X]<<"\t"<<PART[i].r[A_Y]<<"\t"<<PART[i].r[A_Z]<<endl;
-			if(PART[i].surface==ON)
-			{
-				gnu2<<PART[i].r[A_X]<<"\t"<<PART[i].r[A_Y]<<"\t"<<PART[i].r[A_Z]<<endl;
-			}
-		}
-	}
-	else if(CON.get_dimension()==3)
-	{
-		for(int i=0;i<particle_number;i++)
-		{ 
-			if(PART[i].surface==ON && (PART[i].type==FLUID || PART[i].type==ELASTIC || PART[i].type==MAGELAST||PART[i].type==HYPERELAST))//流体だけ表示したいとき
-			{
-				gnu2<<PART[i].r[A_X]<<"\t"<<PART[i].r[A_Y]<<"\t"<<PART[i].r[A_Z]<<endl;
-			}
-		}
-	}
-	gnu1.close();
-	gnu2.close();
-	//*/
-		
-	if(CON.get_flag_ELAST()==ON)
-	{
-		//平均粒子密度&圧力を表示
-		double ave_n0=0;
-		double ave_P=0;
-		int count=0;
-		for(int i=0;i<fluid_number;i++) 
-		{
-			if(PART[i].surface==OFF)
-			{
-				ave_n0+=PART[i].PND; //平均粒子数密度
-				ave_P+=fabs(PART[i].P); //平均圧力
-				count++;
-			}
-		}
-		if(count!=0){ 
-			ave_n0/=count;
-			ave_P/=count;
-		}
+	////座標プロット
+	//ofstream gnu1("0.dat");//解析終了後の全粒子座標をプロット
+	//ofstream gnu2("suf.dat");//表面粒子だけをプロット
+	//
+	//if(CON.get_dimension()==2)
+	//{
+	//	for(int i=0;i<particle_number;i++)
+	//	{ 
+	//		gnu1<<PART[i].r[A_X]<<"\t"<<PART[i].r[A_Y]<<"\t"<<PART[i].r[A_Z]<<endl;
+	//		if(PART[i].surface==ON)
+	//		{
+	//			gnu2<<PART[i].r[A_X]<<"\t"<<PART[i].r[A_Y]<<"\t"<<PART[i].r[A_Z]<<endl;
+	//		}
+	//	}
+	//}
+	//else if(CON.get_dimension()==3)
+	//{
+	//	for(int i=0;i<particle_number;i++)
+	//	{ 
+	//		if(PART[i].surface==ON && (PART[i].type==FLUID || PART[i].type==ELASTIC || PART[i].type==MAGELAST||PART[i].type==HYPERELAST))//流体だけ表示したいとき
+	//		{
+	//			gnu2<<PART[i].r[A_X]<<"\t"<<PART[i].r[A_Y]<<"\t"<<PART[i].r[A_Z]<<endl;
+	//		}
+	//	}
+	//}
+	//gnu1.close();
+	//gnu2.close();
+	////*/
+	//	
+	//if(CON.get_flag_ELAST()==ON)
+	//{
+	//	//平均粒子密度&圧力を表示
+	//	double ave_n0=0;
+	//	double ave_P=0;
+	//	int count=0;
+	//	for(int i=0;i<fluid_number;i++) 
+	//	{
+	//		if(PART[i].surface==OFF)
+	//		{
+	//			ave_n0+=PART[i].PND; //平均粒子数密度
+	//			ave_P+=fabs(PART[i].P); //平均圧力
+	//			count++;
+	//		}
+	//	}
+	//	if(count!=0){ 
+	//		ave_n0/=count;
+	//		ave_P/=count;
+	//	}
 
-		cout<<"average n0="<<ave_n0<<" average P="<<ave_P<<"/"<<CON.get_ave_P_for_FEM_flag()<<" time="<<(GetTickCount()-timeA)*0.001<<"[sec]"<<endl;
-	
-		check_FEM_flag(CON, ELAST, ave_P);
-	}
+	//	cout<<"average n0="<<ave_n0<<" average P="<<ave_P<<"/"<<CON.get_ave_P_for_FEM_flag()<<" time="<<(GetTickCount()-timeA)*0.001<<"[sec]"<<endl;
+	//
+	//	check_FEM_flag(CON, ELAST, ave_P);
+	//}
 	CON.set_current_step(t);
 }
 

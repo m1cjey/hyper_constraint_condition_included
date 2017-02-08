@@ -1039,7 +1039,7 @@ void calc_MPS(mpsconfig &CON, vector<hyperelastic>HYPER,vector<mpselastic>PART,i
 	int d=3;
 	int i=part_id;
 
-	double pnd0=PART[i].PND;
+	double pnd0=HYPER[i].pnd0;
 	double qij[DIMENSION]={0,0,0};
 	double dis=0.;
 	double d_dis=0.;
@@ -1059,11 +1059,11 @@ void calc_MPS(mpsconfig &CON, vector<hyperelastic>HYPER,vector<mpselastic>PART,i
 
 			if(dis<r)
 			{
-				IP=M[0][j] * H[0][j] + M[1][j] * H[1][j] - (M[0][part_id] * H[0][part_id] + M[1][part_id] * H[1][part_id]);
+				IP=M[0][j] * H[0][j] + M[1][j] * H[1][j] +M[2][j] * H[2][j] - (M[0][part_id] * H[0][part_id] + M[1][part_id] * H[1][part_id] +M[2][part_id] * H[2][part_id]);
 				w=kernel4(r,dis);
-				p_grad[A_X]+=d/pnd0*IP*qij[A_X]*w/d_dis;
-				p_grad[A_Y]+=d/pnd0*IP*qij[A_Y]*w/d_dis;
-				p_grad[A_Z]+=d/pnd0*IP*qij[A_Z]*w/d_dis;
+				p_grad[A_X]+=2*d/pnd0*IP*qij[A_X]*w/d_dis;
+				p_grad[A_Y]+=2*d/pnd0*IP*qij[A_Y]*w/d_dis;
+				p_grad[A_Z]+=2*d/pnd0*IP*qij[A_Z]*w/d_dis;
 			}
 		}
 	}
@@ -1581,11 +1581,11 @@ void Magnetic_Moment_Methodv2(mpsconfig &CON,vector<mpselastic> &PART,vector<hyp
 	double mt = 1;                                //流体に対す磁性体の占める体積によって変化させる
 	double ratio;
 	//double mag_center[3]={0,0,-2.1e-05};
-	double mag_center_Z_init =0.02422; //磁石の重心の初期地
-	double mag_center_Z_goal =0.02422; //磁石の重心の目標地．初期地と同じにすれば動かない．
-	double mag_center_dx = 0.2;       //磁石の移動速度(m/s)
+	double mag_center_Z_init =0.02452; //磁石の重心の初期地
+	double mag_center_Z_goal =0.02452; //磁石の重心の目標地．初期地と同じにすれば動かない．
+	double mag_center_dx = 0.2;      //磁石の移動速度(m/s)
 	double mag_center_Z_curr = mag_center_Z_init + current_time * mag_center_dx;         //磁石の現在地の更新
-	double mag_M[3] = {0,0,0.026};    //[T](交流の場合は振幅)
+	double mag_M[3] = {0,0,0.5};    //[T](交流の場合は振幅)
 
 
 	int mesh_size;
@@ -2026,8 +2026,8 @@ void Magnetic_Moment_Methodv2(mpsconfig &CON,vector<mpselastic> &PART,vector<hyp
 				cout<<"体積力:並進力ver.2"<<endl;
 				for(int i = 0; i < fluid_number; i++){
 					double f[3]={0.};
-					cal_WLSM_for_grad(PART, i, CON.get_re3() * CON.get_distancebp(), M, H ,f);
-					//calc_MPS(CON,HYPER,PART,i,M,H,f);
+					//cal_WLSM_for_grad(PART, i, CON.get_re3() * CON.get_distancebp(), M, H ,f);
+					calc_MPS(CON,HYPER,PART,i,M,H,f);
 					for(int D = 0; D < 3; D++)F[D][i] = f[D];
 				}
 				//for(int i = 0; i < fluid_number; i++)for(int D = 0; D < d; D++)H[D][i] *= M[D][i];

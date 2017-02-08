@@ -177,7 +177,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	pt.close();
 
 	int Nw=0;
-	//if(CON.get_flag_HYPER()==ON)	hyper_initial(CON,PART,HYPER,HYPER1, &Nw);
+	if(CON.get_flag_HYPER()==ON)	hyper_initial(CON,PART,HYPER,HYPER1);
 	//cout<<"Nw="<<Nw<<endl;
 	double L=0;
 	double W=100;
@@ -288,7 +288,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout<<"hyper_number="<<hyper_number<<endl;
 
 		//”S’e«ŒvŽZ
-				//if(CON.get_flag_vis()==ON)	calc_vis_f(CON,PART,HYPER,HYPER1,hyper_number,t);
+		//		if(CON.get_flag_vis()==ON)	calc_vis_f(CON,PART,HYPER,HYPER1,hyper_number,t);
 
 		//’´’e«ŒvŽZ
 		if(CON.get_flag_HYPER()==ON)	calc_hyper(CON,PART,HYPER,HYPER1,t,F);//if•ª‚Ì’Ç‰Á15/2/10
@@ -2748,6 +2748,9 @@ void file_initialization()
 	system("mkdir DgDq");
 	system("mkdir n0");
 
+	ofstream init15("stress258.csv", ios::trunc);
+	ofstream init16("stress129.csv", ios::trunc);
+	ofstream init17("stress387.csv", ios::trunc);
 	//system("mkdir Stress");
 	////system("mkdir Wall");
 	//system("mkdir P");
@@ -2766,6 +2769,7 @@ void file_initialization()
 	ofstream init18("E_W.csv", ios::trunc);
 	ofstream init19("E_lam.csv", ios::trunc);*/
 	ofstream init31("E_sum.csv", ios::trunc);
+	//ofstream init33("H_sum.csv", ios::trunc);
 	ofstream init20("J.csv", ios::trunc);
 	ofstream init21("g.csv", ios::trunc);
 	//ofstream init22("stress.csv",ios::trunc);
@@ -2795,9 +2799,9 @@ void file_initialization()
 	init12.close();*/
 	init13.close();
 	init14.close();
-	/*	init15.close();
+	init15.close();
 	init16.close();
-	init17.close();
+	init17.close();/*
 	init18.close();
 	init19.close();*/
 	init20.close();

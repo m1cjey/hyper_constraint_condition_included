@@ -2,7 +2,7 @@
 
 hyperelastic::hyperelastic()
 {
-	for(int i=0;i<400;i++)
+	for(int i=0;i<60;i++)
 	{
 		NEI[i]=0;
 	}

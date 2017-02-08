@@ -225,7 +225,6 @@ void calc_constant(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> &
 		}
 		HYPER[i].N=N;
 		HYPER[i].pnd0=N;
-
 	}
 
 
@@ -515,9 +514,9 @@ void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> 
 			//重力の影響
 			p_half_p[A_Z]-=G*mh;
 			//粘性項の影響
-			p_half_p[A_X]+=mh*HYPER[i].vis_force[A_X];
-			p_half_p[A_Y]+=mh*HYPER[i].vis_force[A_Y];
-			p_half_p[A_Z]+=mh*HYPER[i].vis_force[A_Z];
+			p_half_p[A_X]+=HYPER[i].vis_force[A_X];
+			p_half_p[A_Y]+=HYPER[i].vis_force[A_Y];
+			p_half_p[A_Z]+=HYPER[i].vis_force[A_Z];
 			//磁場の考慮
 			//p_half_p[A_X]+=F[A_X][i]*V;//density;
 			//p_half_p[A_Y]+=F[A_Y][i]*V;//density;
@@ -527,7 +526,6 @@ void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> 
 			hp_x[i]=HYPER[i].p_n[A_X]+Dt*0.5*p_half_p[A_X];
 			hp_y[i]=HYPER[i].p_n[A_Y]+Dt*0.5*p_half_p[A_Y];
 			hp_z[i]=HYPER[i].p_n[A_Z]+Dt*0.5*p_half_p[A_Z];
-
 		}
 
 
@@ -637,8 +635,6 @@ void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> 
 				gauss(DfDx,fx,h_num);
 				//GaussSeidelvh(DfDx,h_num,fx,ep_gs);
 				sum=0;
-				E_old=E;
-				E=0.;
 
 #ifdef _OPENMP
 #pragma omp for
@@ -646,14 +642,14 @@ void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> 
 				for(int i=0;i<h_num;i++)
 				{
 					XX[i]-=fx[i];//*0.5*mi/(Dt*Dt)*V*fx[i];//*/
-					E+=fabs(fx[i]);
-					sum+=fabs(XX[i]);
+					sum+=fabs(fx[i]);
 				}
 
 			}
 
-			////誤差の評価
-			E/=sum;
+			//誤差の評価
+			E_old=E;
+			E=sum;
 
 			//sum=0;
 			//for(int i=0; i<h_num; i++)
@@ -664,7 +660,7 @@ void newton_raphson(mpsconfig &CON,vector<mpselastic> PART,vector<hyperelastic> 
 			//E=sum;
 
 
-			if(count==1 || count%1000==0)
+			if(count==1 || count%100000==0)
 			{		
 				/*
 				cout<<"XX_old["<<i<<"]-d=X["<<i<<"]	";
@@ -740,51 +736,50 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 		double p_half_p[DIMENSION]={0,0,0};
 
 
-		//#ifdef _OPENMP
-		//#pragma omp for
-		//#endif
-		//		for(int i=0; i<Nw; i++)
-		//		{
-		//			fx[i]=0.;
-		//			XX_old[i]=lambda[i];	//解を記憶
-		//
-		//			//half_pの計算
-		//			p_half_p[A_X]=0.;
-		//			p_half_p[A_Y]=0.;
-		//			p_half_p[A_Z]=0.;
-		//
-		//			int Ni=HYPER[i].N;
-		//			for(int j=0;j<Ni;j++)
-		//			{	
-		//				int k=HYPER[i].NEI[j];
-		//				p_half_p[A_X]+=-lambda[k]*HYPER1[k*h_num+i].DgDq_n[0];
-		//				p_half_p[A_Y]+=-lambda[k]*HYPER1[k*h_num+i].DgDq_n[1];
-		//				p_half_p[A_Z]+=-lambda[k]*HYPER1[k*h_num+i].DgDq_n[2];
-		//			}//jに関するfor文の終わり
-		//			p_half_p[A_X]+=-lambda[i]*HYPER1[i*h_num+i].DgDq_n[0];
-		//			p_half_p[A_Y]+=-lambda[i]*HYPER1[i*h_num+i].DgDq_n[1];
-		//			p_half_p[A_Z]+=-lambda[i]*HYPER1[i*h_num+i].DgDq_n[2];
-		//
-		//			//位置座標の計算
-		//			PART[i].r[A_X]=HYPER[i].q_n[A_X]+Dt*(hp_x[i]+Dt*0.5*p_half_p[A_X])/mh;
-		//			PART[i].r[A_Y]=HYPER[i].q_n[A_Y]+Dt*(hp_y[i]+Dt*0.5*p_half_p[A_Y])/mh;
-		//			PART[i].r[A_Z]=HYPER[i].q_n[A_Z]+Dt*(hp_z[i]+Dt*0.5*p_half_p[A_Z])/mh;
-		//			//fx[i]=(PART[i].r[A_X]-PART[i].q0[A_X])*(PART[i].r[A_X]-PART[i].q0[A_X])+(PART[i].r[A_Y]-PART[i].q0[A_Y])*(PART[i].r[A_Y]-PART[i].q0[A_Y])+(PART[i].r[A_Z]-PART[i].q0[A_Z])*(PART[i].r[A_Z]-PART[i].q0[A_Z]);
-		//			fx[i]=PART[i].r[A_X]-PART[i].q0[A_X]+PART[i].r[A_Y]-PART[i].q0[A_Y]+PART[i].r[A_Z]-PART[i].q0[A_Z];
-		//			//PART[i].r[A_X]=PART[i].q0[A_X];
-		//			//PART[i].r[A_Y]=PART[i].q0[A_Y];
-		//			PART[i].r[A_Z]=PART[i].q0[A_Z];
-		//
-		//			//cout<<"fx"<<fx[i]<<endl;
-		//		}
+#ifdef _OPENMP
+#pragma omp for
+#endif
+		for(int i=0; i<Nw; i++)
+		{
+			fx[i]=0.;
+			XX_old[i]=lambda[i];	//解を記憶
 
+			//half_pの計算
+			p_half_p[A_X]=0.;
+			p_half_p[A_Y]=0.;
+			p_half_p[A_Z]=0.;
+
+			int Ni=HYPER[i].N;
+			for(int j=0;j<Ni;j++)
+			{	
+				int k=HYPER[i].NEI[j];
+				p_half_p[A_X]+=-lambda[k]*HYPER1[k*h_num+i].DgDq_n[0];
+				p_half_p[A_Y]+=-lambda[k]*HYPER1[k*h_num+i].DgDq_n[1];
+				p_half_p[A_Z]+=-lambda[k]*HYPER1[k*h_num+i].DgDq_n[2];
+			}//jに関するfor文の終わり
+			p_half_p[A_X]+=-lambda[i]*HYPER1[i*h_num+i].DgDq_n[0];
+			p_half_p[A_Y]+=-lambda[i]*HYPER1[i*h_num+i].DgDq_n[1];
+			p_half_p[A_Z]+=-lambda[i]*HYPER1[i*h_num+i].DgDq_n[2];
+
+			//位置座標の計算
+			PART[i].r[A_X]=HYPER[i].q_n[A_X]+Dt*(hp_x[i]+Dt*0.5*p_half_p[A_X])/mh;
+			PART[i].r[A_Y]=HYPER[i].q_n[A_Y]+Dt*(hp_y[i]+Dt*0.5*p_half_p[A_Y])/mh;
+			PART[i].r[A_Z]=HYPER[i].q_n[A_Z]+Dt*(hp_z[i]+Dt*0.5*p_half_p[A_Z])/mh;
+			//fx[i]=(PART[i].r[A_X]-PART[i].q0[A_X])*(PART[i].r[A_X]-PART[i].q0[A_X])+(PART[i].r[A_Y]-PART[i].q0[A_Y])*(PART[i].r[A_Y]-PART[i].q0[A_Y])+(PART[i].r[A_Z]-PART[i].q0[A_Z])*(PART[i].r[A_Z]-PART[i].q0[A_Z]);
+			fx[i]=PART[i].r[A_X]-PART[i].q0[A_X]+PART[i].r[A_Y]-PART[i].q0[A_Y]+PART[i].r[A_Z]-PART[i].q0[A_Z];
+			//PART[i].r[A_X]=PART[i].q0[A_X];
+			//PART[i].r[A_Y]=PART[i].q0[A_Y];
+			PART[i].r[A_Z]=PART[i].q0[A_Z];
+
+			//cout<<"fx"<<fx[i]<<endl;
+		}
 
 #ifdef _OPENMP
 #pragma omp for
 #endif
 		for(int i=Nw;i<h_num;i++)
 		{
-			//fx[i]=0.;
+			fx[i]=0.;
 			XX_old[i]=lambda[i];	//解を記憶
 
 			//half_pの計算
@@ -979,7 +974,7 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 			double Ji=calc_det3(p_Fi);
 			HYPER[i].J=Ji;
 			//fxの計算
-			fx[i]=V*(1-Ji);//1-J;//
+			fx[i]+=V*(1-Ji);//1-J;//
 			//		cout<<"fx"<<i<<"="<<V*(1-J)<<endl;
 
 			//t_inverse_Fiの計算
@@ -1116,36 +1111,36 @@ void calc_newton_function(mpsconfig &CON,vector<mpselastic> PART,vector<hyperela
 		double DgDq_ji[DIMENSION]={0,0,0};
 		double DgDq_ii[DIMENSION]={0,0,0};
 
-		//#ifdef _OPENMP
-		//#pragma omp for
-		//#endif
-		//		for(int i=0;i<Nw;i++)
-		//		{
-		//			int Ni=HYPER[i].N;
-		//
-		//			DgDq_ii[A_X]=HYPER1[i*h_num+i].DgDq_n[A_X];
-		//			DgDq_ii[A_Y]=HYPER1[i*h_num+i].DgDq_n[A_Y];
-		//			DgDq_ii[A_Z]=HYPER1[i*h_num+i].DgDq_n[A_Z];
-		//
-		//			for(int j=0;j<Ni;j++)
-		//			{
-		//				int jn=HYPER[i].NEI[j];
-		//				DgDq_ji[A_X]=HYPER1[jn*h_num+i].DgDq_n[A_X];
-		//				DgDq_ji[A_Y]=HYPER1[jn*h_num+i].DgDq_n[A_Y];
-		//				DgDq_ji[A_Z]=HYPER1[jn*h_num+i].DgDq_n[A_Z];
-		//
-		//				//DfDx[i*h_num+jn]+=-Dt*Dt/mi*(DgDq_ji[A_X]*(PART[i].r[A_X]-PART[i].q0[A_X])+DgDq_ji[A_Y]*(PART[i].r[A_Y]-PART[i].q0[A_Y])+DgDq_ji[A_Z]*(PART[i].r[A_Z]-PART[i].q0[A_Z]));
-		//				DfDx[i*h_num+jn]+=-0.5*Dt*Dt/mi*(DgDq_ji[A_X]+DgDq_ji[A_Y]+DgDq_ji[A_Z]);
-		//				//cout<<"DfDx"<<jn<<"_"<<i<<"="<<DfDx[jn*h_num+i]<<endl;
-		//			}//*/
-		//			DfDx[i*h_num+i]+=-0.5*Dt*Dt/mi*(DgDq_ii[A_X]+DgDq_ii[A_Y]+DgDq_ii[A_Z]);
-		//			//DfDx[i*h_num+i]+=-Dt*Dt/mi*(DgDq_ii[A_X]*(PART[i].r[A_X]-PART[i].q0[A_X])+DgDq_ii[A_Y]*(PART[i].r[A_Y]-PART[i].q0[A_Y])+DgDq_ii[A_Z]*(PART[i].r[A_Z]-PART[i].q0[A_Z]));
-		//			//cout<<"DfDx"<<i<<"_"<<i<<"="<<DfDx[i*h_num+i]<<endl;
-		//		}
-		//		//double *part_fx=new double [h_num];
-		//		//double *w_DfDx=new double [h_num*h_num];
-		//		//double *w_fx=new double [h_num];
-		//		//int *Nw=new int [h_num];
+#ifdef _OPENMP
+#pragma omp for
+#endif
+		for(int i=0;i<Nw;i++)
+		{
+			int Ni=HYPER[i].N;
+
+			DgDq_ii[A_X]=HYPER1[i*h_num+i].DgDq_n[A_X];
+			DgDq_ii[A_Y]=HYPER1[i*h_num+i].DgDq_n[A_Y];
+			DgDq_ii[A_Z]=HYPER1[i*h_num+i].DgDq_n[A_Z];
+
+			for(int j=0;j<Ni;j++)
+			{
+				int jn=HYPER[i].NEI[j];
+				DgDq_ji[A_X]=HYPER1[jn*h_num+i].DgDq_n[A_X];
+				DgDq_ji[A_Y]=HYPER1[jn*h_num+i].DgDq_n[A_Y];
+				DgDq_ji[A_Z]=HYPER1[jn*h_num+i].DgDq_n[A_Z];
+
+				//DfDx[i*h_num+jn]+=-Dt*Dt/mi*(DgDq_ji[A_X]*(PART[i].r[A_X]-PART[i].q0[A_X])+DgDq_ji[A_Y]*(PART[i].r[A_Y]-PART[i].q0[A_Y])+DgDq_ji[A_Z]*(PART[i].r[A_Z]-PART[i].q0[A_Z]));
+				DfDx[i*h_num+jn]+=-0.5*Dt*Dt/mi*(DgDq_ji[A_X]+DgDq_ji[A_Y]+DgDq_ji[A_Z]);
+				//cout<<"DfDx"<<jn<<"_"<<i<<"="<<DfDx[jn*h_num+i]<<endl;
+			}//*/
+			DfDx[i*h_num+i]+=-0.5*Dt*Dt/mi*(DgDq_ii[A_X]+DgDq_ii[A_Y]+DgDq_ii[A_Z]);
+			//DfDx[i*h_num+i]+=-Dt*Dt/mi*(DgDq_ii[A_X]*(PART[i].r[A_X]-PART[i].q0[A_X])+DgDq_ii[A_Y]*(PART[i].r[A_Y]-PART[i].q0[A_Y])+DgDq_ii[A_Z]*(PART[i].r[A_Z]-PART[i].q0[A_Z]));
+			//cout<<"DfDx"<<i<<"_"<<i<<"="<<DfDx[i*h_num+i]<<endl;
+		}
+		//double *part_fx=new double [h_num];
+		//double *w_DfDx=new double [h_num*h_num];
+		//double *w_fx=new double [h_num];
+		//int *Nw=new int [h_num];
 
 		//for(int i=0;i<h_num;i++)
 		//{
@@ -1243,62 +1238,7 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 #ifdef _OPENMP
 #pragma omp for
 #endif
-			for(int i=0;i<Nw;i++)
-			{
-				double p_half_p[DIMENSION]={0,0,0};
-				int Ni=HYPER[i].N;
-				for(int j=0;j<Ni;j++)
-				{		
-					int k=HYPER[i].NEI[j];
-					p_half_p[A_X]+=(HYPER[k].stress_n[0][0]-HYPER[k].lambda)*HYPER1[k*h_num+i].DgDq_n[0]+HYPER[k].stress_n[0][1]*HYPER1[k*h_num+i].DgDq_n[1]+HYPER[k].stress_n[0][2]*HYPER1[k*h_num+i].DgDq_n[2];
-					p_half_p[A_Y]+=HYPER[k].stress_n[1][0]*HYPER1[k*h_num+i].DgDq_n[0]+(HYPER[k].stress_n[1][1]-HYPER[k].lambda)*HYPER1[k*h_num+i].DgDq_n[1]+HYPER[k].stress_n[1][2]*HYPER1[k*h_num+i].DgDq_n[2];
-					p_half_p[A_Z]+=HYPER[k].stress_n[2][0]*HYPER1[k*h_num+i].DgDq_n[0]+HYPER[k].stress_n[2][1]*HYPER1[k*h_num+i].DgDq_n[1]+(HYPER[k].stress_n[2][2]-HYPER[k].lambda)*HYPER1[k*h_num+i].DgDq_n[2];
-				}//jに関するfor文の終わり	
-				p_half_p[A_X]+=(HYPER[i].stress_n[0][0]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq_n[0]+HYPER[i].stress_n[0][1]*HYPER1[i*h_num+i].DgDq_n[1]+HYPER[i].stress_n[0][2]*HYPER1[i*h_num+i].DgDq_n[2];
-				p_half_p[A_Y]+=HYPER[i].stress_n[1][0]*HYPER1[i*h_num+i].DgDq_n[0]+(HYPER[i].stress_n[1][1]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq_n[1]+HYPER[i].stress_n[1][2]*HYPER1[i*h_num+i].DgDq_n[2];
-				p_half_p[A_Z]+=HYPER[i].stress_n[2][0]*HYPER1[i*h_num+i].DgDq_n[0]+HYPER[i].stress_n[2][1]*HYPER1[i*h_num+i].DgDq_n[1]+(HYPER[i].stress_n[2][2]-HYPER[i].lambda)*HYPER1[i*h_num+i].DgDq_n[2];
-
-				//重力項
-
-				/*if(flag_G==ON)	*/p_half_p[A_Z]-=G*mi;
-				//粘性項
-				//if(flag_vis==ON)
-				{
-					p_half_p[A_X]+=mi*HYPER[i].vis_force[A_X];
-					p_half_p[A_Y]+=mi*HYPER[i].vis_force[A_Y];
-					p_half_p[A_Z]+=mi*HYPER[i].vis_force[A_Z];
-				}
-				//磁力項
-				//if(flag_FEM==ON&&PART[i].toFEM==ON)
-				//{
-				//	p_half_p[A_X]+=V*F[A_X][i];//density;
-				//	p_half_p[A_Y]+=V*F[A_Y][i];//density;
-				//	p_half_p[A_Z]+=V*F[A_Z][i];//density;
-				//}
-
-
-				//half_pの更新
-				HYPER[i].half_p[A_X]=HYPER[i].p_n[A_X]+Dt*0.5*p_half_p[A_X];
-				HYPER[i].half_p[A_Y]=HYPER[i].p_n[A_Y]+Dt*0.5*p_half_p[A_Y];
-				HYPER[i].half_p[A_Z]=HYPER[i].p_n[A_Z]+Dt*0.5*p_half_p[A_Z];//
-				PART[i].r[A_X]=HYPER[i].q_n[A_X]+Dt*HYPER[i].half_p[A_X]/mi;
-				PART[i].r[A_Y]=HYPER[i].q_n[A_Y]+Dt*HYPER[i].half_p[A_Y]/mi;
-				PART[i].r[A_Z]=HYPER[i].q_n[A_Z]+Dt*HYPER[i].half_p[A_Z]/mi;
-
-
-				HYPER[i].half_p[A_X]=Dt*(PART[i].q0[A_X]-PART[i].r[A_X])/mi;
-				HYPER[i].half_p[A_Y]=Dt*(PART[i].q0[A_Y]-PART[i].r[A_Y])/mi;
-				HYPER[i].half_p[A_Z]=Dt*(PART[i].q0[A_Z]-PART[i].r[A_Z])/mi;
-				//位置座標の更新
-				PART[i].r[A_X]=PART[i].q0[A_X];
-				PART[i].r[A_Y]=PART[i].q0[A_Y];
-				PART[i].r[A_Z]=PART[i].q0[A_Z];
-			}
-
-#ifdef _OPENMP
-#pragma omp for
-#endif
-			for(int i=Nw;i<h_num;i++)
+			for(int i=0;i<h_num;i++)
 			{
 				//if(PART[i].toFEM==ON)	mi=mh;
 				//else
@@ -1338,17 +1278,17 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 				//粘性項
 				//if(flag_vis==ON)
 				{
-					p_half_p[A_X]+=mi*HYPER[i].vis_force[A_X];
-					p_half_p[A_Y]+=mi*HYPER[i].vis_force[A_Y];
-					p_half_p[A_Z]+=mi*HYPER[i].vis_force[A_Z];
+					p_half_p[A_X]+=HYPER[i].vis_force[A_X];
+					p_half_p[A_Y]+=HYPER[i].vis_force[A_Y];
+					p_half_p[A_Z]+=HYPER[i].vis_force[A_Z];
 				}
 				//磁力項
-				//if(flag_FEM==ON&&PART[i].toFEM==ON)
-				//{
-				//	p_half_p[A_X]+=V*F[A_X][i];//density;
-				//	p_half_p[A_Y]+=V*F[A_Y][i];//density;
-				//	p_half_p[A_Z]+=V*F[A_Z][i];//density;
-				//}
+				if(flag_FEM==ON&&PART[i].toFEM==ON)
+				{
+					p_half_p[A_X]+=V*F[A_X][i];//density;
+					p_half_p[A_Y]+=V*F[A_Y][i];//density;
+					p_half_p[A_Z]+=V*F[A_Z][i];//density;
+				}
 
 
 				//half_pの更新
@@ -1376,17 +1316,7 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 #ifdef _OPENMP
 #pragma omp for
 #endif
-			for(int i=Nw;i<h_num;i++)
-			{
-				HYPER[i].p[A_X]=0.;
-				HYPER[i].p[A_Y]=0.;
-				HYPER[i].p[A_Z]=0.;////
-			}
-
-#ifdef _OPENMP
-#pragma omp for
-#endif
-			for(int i=Nw;i<h_num;i++)
+			for(int i=0;i<h_num;i++)
 			{
 				//if(PART[i].toFEM==ON)	mi=mh;
 				//else
@@ -1420,16 +1350,16 @@ void calc_half_p(mpsconfig &CON,vector<mpselastic> &PART,vector<hyperelastic> &H
 				//粘性項
 				//if(flag_vis==ON)
 				{
-					p_half_p[A_X]+=mi*HYPER[i].vis_force[A_X];
-					p_half_p[A_Y]+=mi*HYPER[i].vis_force[A_Y];
-					p_half_p[A_Z]+=mi*HYPER[i].vis_force[A_Z];
+					p_half_p[A_X]+=HYPER[i].vis_force[A_X];
+					p_half_p[A_Y]+=HYPER[i].vis_force[A_Y];
+					p_half_p[A_Z]+=HYPER[i].vis_force[A_Z];
 				}
 				//磁力項
-				//if(flag_FEM==ON&&PART[i].toFEM==ON)
+				if(flag_FEM==ON&&PART[i].toFEM==ON)
 				{
-					//p_half_p[A_X]+=V*F[A_X][i];//density;
-					//p_half_p[A_Y]+=V*F[A_Y][i];//density;
-					//p_half_p[A_Z]+=V*F[A_Z][i];//density;
+					p_half_p[A_X]+=V*F[A_X][i];//density;
+					p_half_p[A_Y]+=V*F[A_Y][i];//density;
+					p_half_p[A_Z]+=V*F[A_Z][i];//density;
 				}
 
 				//運動量の更新
@@ -1867,16 +1797,16 @@ void calc_differential_p(mpsconfig &CON,vector<mpselastic>PART,vector<hyperelast
 			//}
 			//if(flag_vis==ON)
 			{
-				HYPER[i].differential_p[A_X]+=Dt*0.5*mh*HYPER[i].vis_force[A_X];
-				HYPER[i].differential_p[A_Y]+=Dt*0.5*mh*HYPER[i].vis_force[A_Y];
-				HYPER[i].differential_p[A_Z]+=Dt*0.5*mh*HYPER[i].vis_force[A_Z];
+				HYPER[i].differential_p[A_X]+=Dt*0.5*HYPER[i].vis_force[A_X];
+				HYPER[i].differential_p[A_Y]+=Dt*0.5*HYPER[i].vis_force[A_Y];
+				HYPER[i].differential_p[A_Z]+=Dt*0.5*HYPER[i].vis_force[A_Z];
 			}
 			//if(flag_FEM==ON && PART[i].toFEM==ON)
-			//{
-			//	HYPER[i].differential_p[A_X]+=Dt*0.5*F[A_X][i]*V;//density;
-			//	HYPER[i].differential_p[A_Y]+=Dt*0.5*F[A_Y][i]*V;//density;
-			//	HYPER[i].differential_p[A_Z]+=Dt*0.5*F[A_Z][i]*V;//density;
-			//}
+			{
+				HYPER[i].differential_p[A_X]+=Dt*0.5*F[A_X][i]*V;//density;
+				HYPER[i].differential_p[A_Y]+=Dt*0.5*F[A_Y][i]*V;//density;
+				HYPER[i].differential_p[A_Z]+=Dt*0.5*F[A_Z][i]*V;//density;
+			}
 			//}
 			//	cout<<"----------OK"<<endl;
 		}
@@ -2304,7 +2234,7 @@ void momentum_movie_AVS(mpsconfig &CON,int t,vector<mpselastic> PART,vector<hype
 	//各節点の情報値入力
 	for(int i=0;i<h_num;i++)
 	{
-		fp<<i<<" "<<HYPER[i].p[A_X]<<" "<<HYPER[i].p[A_Y]<<" "<<HYPER[i].p[A_Z]<<" "<<HYPER[i].lambda<<" "<<F[A_X][i]<<" "<<F[A_Y][i]<<" "<<F[A_Z][i]<<" "<<mh*HYPER[i].vis_force[A_X]<<" "<<mh*HYPER[i].vis_force[A_Y]<<" "<<mh*HYPER[i].vis_force[A_Z]<<endl;
+		fp<<i<<" "<<HYPER[i].p[A_X]<<" "<<HYPER[i].p[A_Y]<<" "<<HYPER[i].p[A_Z]<<" "<<HYPER[i].lambda<<" "<<F[A_X][i]<<" "<<F[A_Y][i]<<" "<<F[A_Z][i]<<" "<<HYPER[i].vis_force[A_X]<<" "<<HYPER[i].vis_force[A_Y]<<" "<<HYPER[i].vis_force[A_Z]<<endl;
 		//fp<<i<<" "<<NODE[i].depth<<" "<<NODE[i].L/le<<" "<<NODE[i].potential<<" "<<NODE[i].Fs<<" "<<endl;
 	}
 	//}
@@ -2950,7 +2880,6 @@ void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> 
 	double sum_e_lam=0;
 	double sum_e_W=0;
 	double sum_e=0;
-	double sum_e_F=0.;
 	double vv=0;
 	double energy=0;
 
@@ -2968,15 +2897,12 @@ void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> 
 		//energy=0.5/mi*vv+W[i]*V+HYPER[i].lambda*(1-HYPER[i].J)*V;
 		if(CON.get_flag_G()==ON)	energy=0.5/mi*vv+mi*G*PART[i].r[A_Z]+HYPER[i].W*V+HYPER[i].lambda*(1-HYPER[i].J)*V;
 		if(CON.get_flag_G()==OFF)	energy=0.5/mi*vv+HYPER[i].W*V+HYPER[i].lambda*(1-HYPER[i].J)*V;
-		if(CON.get_FEM_flag()==ON)	energy+=HYPER[i].Ef;
 		sum_e_T+=0.5/mi*vv;
 		sum_e_g+=mi*G*PART[i].r[A_Z];
 		sum_e_lam+=HYPER[i].lambda*(1-HYPER[i].J)*V;
 		sum_e_W+=HYPER[i].W*V;
-		sum_e_F+=HYPER[i].Ef;
 		sum_e+=energy;
-
-		fe<<energy<<","<<0.5/mi*vv<<","<<mi*G*PART[i].r[A_Z]<<","<<HYPER[i].W*V<<","<<HYPER[i].lambda*(1-HYPER[i].J)*V<<","<<HYPER[i].Ef<<endl;
+		fe<<energy<<","<<0.5/mi*vv<<","<<mi*G*PART[i].r[A_Z]<<","<<HYPER[i].W*V<<","<<HYPER[i].lambda*(1-HYPER[i].J)*V<<endl;
 		/*	e<<energy<<",";
 		e_T<<0.5/mi*vv<<",";
 		e_g<<mi*G*PART[i].r[A_Z]<<",";
@@ -2991,8 +2917,8 @@ void output_energy(mpsconfig CON, vector<mpselastic> PART, vector<hyperelastic> 
 	e_lam<<endl;*/
 
 
-	if(t==1)	e_sum<<"E,E_T,E_g,E_W,E_lam,E_f\n";
-	e_sum<<sum_e<<","<<sum_e_T<<","<<sum_e_g<<","<<sum_e_W<<","<<sum_e_lam<<","<<sum_e_F<<endl;//*/
+	if(t==1)	e_sum<<"E,E_T,E_g,E_W,E_lam\n";
+	e_sum<<sum_e<<","<<sum_e_T<<","<<sum_e_g<<","<<sum_e_W<<","<<sum_e_lam<<endl;//*/
 
 	/*	e.close();
 	e_T.close();

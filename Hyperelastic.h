@@ -8,8 +8,10 @@ public:
 	unsigned ID;
 	int NEI[500];
 	int N;
+
 	double Ef;
 	double lambda;
+	double pnd0;
 	double half_p[DIMENSION];
 	double stress[DIMENSION][DIMENSION];
 	double differential_p[DIMENSION];
@@ -24,6 +26,7 @@ public:
 	double Fi[DIMENSION][DIMENSION];
 	double vis_force[DIMENSION];
 	double vec_norm[DIMENSION];
+	double q_n[DIMENSION];
 	hyperelastic();
 };
 
@@ -33,6 +36,7 @@ public:
 	unsigned ID;
 	double wiin;
 	double DgDq[DIMENSION];
+	double DgDq_n[DIMENSION];
 	double aiin[DIMENSION];
 	double n0ij[DIMENSION];
 	double spl_f;
